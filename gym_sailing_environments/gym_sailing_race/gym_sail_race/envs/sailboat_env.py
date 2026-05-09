@@ -136,6 +136,7 @@ class SailboatRaceEnv(BoatEnv):
             self.mark_index == len(self.TARGET_SEQUENCE) - 1
             and self._inside_rounding_zone(distance2target)
             and self._target_is_to_port()
+            and self._passed_halfway_into_final_zone(distance2target)
         )
 
     def step(self, action):
@@ -223,6 +224,12 @@ class SailboatRaceEnv(BoatEnv):
         return (
             (final_mark[0], finish_y),
             (min(50.0, final_mark[0] + line_length), finish_y),
+        )
+    
+    def _passed_halfway_into_final_zone(self, distance2target):
+        return (
+            np.linalg.norm(distance2target)
+            < self.TARGET_RAD * 0.5
         )
 
     def reset(self, options=None, seed=None):
