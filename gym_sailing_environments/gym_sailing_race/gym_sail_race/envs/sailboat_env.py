@@ -31,7 +31,7 @@ RACE_MARKS = [
     REACH_MARK,
 ]
 
-TARGET_SEQUENCE = [
+DEFAULT_TARGET_SEQUENCE = [
     WINDWARD_MARK,
     REACH_MARK,
     LEEWARD_MARK,
@@ -57,7 +57,7 @@ FINISH_LINE = (
 
 class SailboatRaceEnv(BoatEnv):
     MARKS = RACE_MARKS
-    TARGET_SEQUENCE = TARGET_SEQUENCE
+    DEFAULT_TARGET_SEQUENCE = DEFAULT_TARGET_SEQUENCE
     MARK_REWARD = 50
     FINISH_REWARD = 100
     ROUNDING_ZONE_MULTIPLIER = 2.5
@@ -65,8 +65,12 @@ class SailboatRaceEnv(BoatEnv):
     VALID_PORT_ROUNDING_BONUS = 0.5
     EXIT_ZONE_PROGRESS_WEIGHT = 5.0
 
-    def __init__(self, render_mode=None):
+    def __init__(self, render_mode=None, target_sequence=None):
         super().__init__(render_mode)
+        if target_sequence is None:
+            self.TARGET_SEQUENCE = list(self.DEFAULT_TARGET_SEQUENCE)
+        else:
+            self.TARGET_SEQUENCE = list(target_sequence)
         self.mark_index = 0
         self.TARGET = self.TARGET_SEQUENCE[self.mark_index]
         self.start_line = START_LINE
