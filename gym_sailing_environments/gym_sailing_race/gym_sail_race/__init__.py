@@ -7,6 +7,11 @@ register(
 )
 
 register(
+    id="SailboatRace2Mark-v0",
+    entry_point="gym_sail_race.envs.sailboat_env:SailboatRaceEnv2Mark",
+)
+
+register(
     id="SailboatDiscrete-v0",
     entry_point="gym_sail_race.envs:SailboatDiscreteEnv",
     max_episode_steps=3000,
