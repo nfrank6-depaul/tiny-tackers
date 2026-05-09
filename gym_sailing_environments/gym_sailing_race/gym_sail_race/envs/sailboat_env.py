@@ -71,7 +71,7 @@ class SailboatRaceEnv(BoatEnv):
         self.TARGET = self.TARGET_SEQUENCE[self.mark_index]
         self.start_line = START_LINE
         self.show_start_line = True
-        self.finish_line = FINISH_LINE
+        self.finish_line = self._make_finish_line()
         self.prev_boat_y = None
         self.valid_port_rounding_started = False
 
@@ -207,13 +207,22 @@ class SailboatRaceEnv(BoatEnv):
 
         self.last_reward = reward
         return terminated, reward
+    
+    def _make_finish_line(self):
+        final_mark = self.TARGET_SEQUENCE[-1]
+        finish_y = final_mark[1] - 2.0
+
+        return (
+            (final_mark[0], finish_y),
+            (min(50.0, final_mark[0] + 10.0), finish_y),
+        )
 
     def reset(self, options=None, seed=None):
         self.mark_index = 0
         self.TARGET = self.TARGET_SEQUENCE[self.mark_index]
         self.start_line = START_LINE
         self.show_start_line = True
-        self.finish_line = FINISH_LINE
+        self.finish_line = self._make_finish_line()
         self.prev_boat_y = None
         self.valid_port_rounding_started = False
         start_x, start_y = LEEWARD_MARK
