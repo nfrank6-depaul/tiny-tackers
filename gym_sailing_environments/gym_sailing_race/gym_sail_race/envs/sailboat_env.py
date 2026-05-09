@@ -217,11 +217,11 @@ class SailboatRaceEnv(BoatEnv):
         self.valid_port_rounding_started = False
         start_x, start_y = LEEWARD_MARK
         self.boat = SailBoat(
-            x=start_x + self.BOAT_LENGTH,
-            y=start_y,
-            heading=np.pi / 2,
-            heading_dot=np.random.uniform(-0.03, 0.03),
-            speed=np.random.uniform(-0.2, 0.2),
+            x=start_x + self.BOAT_LENGTH + self.np_random.uniform(-1.0, 1.0),
+            y=start_y + self.np_random.uniform(-2.0, 2.0),
+            heading=np.pi / 2 + self.np_random.uniform(-0.25, 0.25),
+            heading_dot=self.np_random.uniform(-0.03, 0.03),
+            speed=self.np_random.uniform(-0.2, 0.2),
         )
         return super().reset(options, seed)
 
