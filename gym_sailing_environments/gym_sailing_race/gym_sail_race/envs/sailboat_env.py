@@ -61,9 +61,9 @@ class SailboatRaceEnv(BoatEnv):
     MARK_REWARD = 50
     FINISH_REWARD = 100
     ROUNDING_ZONE_MULTIPLIER = 2.5
-    INVALID_ROUNDING_PENALTY = 2.0
+    INVALID_ROUNDING_PENALTY = 1.0
     VALID_PORT_ROUNDING_BONUS = 0.5
-    EXIT_ZONE_PROGRESS_WEIGHT = 10.0
+    EXIT_ZONE_PROGRESS_WEIGHT = 5.0
 
     def __init__(self, render_mode=None, target_sequence=None):
         super().__init__(render_mode)
