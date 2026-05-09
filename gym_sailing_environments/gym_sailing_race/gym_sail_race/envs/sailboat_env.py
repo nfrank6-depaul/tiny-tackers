@@ -6,7 +6,7 @@ from gym_sail_race.physics.sailboat import SailBoat
 # Olympic triangle race-course geometry.
 # The windward/leeward base is vertical and positioned on the right side.
 COURSE_CENTER = np.array([25.0, 25.0])
-VERTICAL_BASE_X = 38.0
+VERTICAL_BASE_X = 32.0
 TRIANGLE_SIDE = 30.0
 TRIANGLE_HEIGHT = TRIANGLE_SIDE * np.sqrt(3) / 2
 

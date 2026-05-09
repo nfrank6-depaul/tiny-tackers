@@ -1,0 +1,2 @@
+agent,source_model,env_id,total_reward,timesteps,final_info
+PPO Base Model on SailboatRace-v0,models/ppo/base/ppo_base_1M.zip,SailboatRace-v0,-53.33614148583873,403,{'distance2target': np.float64(21.538652446749143)}
