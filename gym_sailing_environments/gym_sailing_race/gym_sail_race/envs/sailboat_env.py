@@ -64,6 +64,7 @@ class SailboatRaceEnv(BoatEnv):
     INVALID_ROUNDING_PENALTY = 1.0
     VALID_PORT_ROUNDING_BONUS = 0.5
     EXIT_ZONE_PROGRESS_WEIGHT = 5.0
+    FINISH_LINE_SIDE = "right"
 
     def __init__(self, render_mode=None):
         super().__init__(render_mode)
@@ -211,10 +212,17 @@ class SailboatRaceEnv(BoatEnv):
     def _make_finish_line(self):
         final_mark = self.TARGET_SEQUENCE[-1]
         finish_y = final_mark[1] - 2.0
+        line_length = 10.0
+
+        if self.FINISH_LINE_SIDE == "left":
+            return (
+                (max(0.0, final_mark[0] - line_length), finish_y),
+                (final_mark[0], finish_y),
+            )
 
         return (
             (final_mark[0], finish_y),
-            (min(50.0, final_mark[0] + 10.0), finish_y),
+            (min(50.0, final_mark[0] + line_length), finish_y),
         )
 
     def reset(self, options=None, seed=None):
@@ -240,6 +248,7 @@ class SailboatRaceEnv2Mark(SailboatRaceEnv):
         WINDWARD_MARK,
         REACH_MARK,
     ]
+    FINISH_LINE_SIDE = "left"
     
 class SailboatDiscreteEnv(BoatDiscreteEnv):
     def __init__(self, render_mode=None):
