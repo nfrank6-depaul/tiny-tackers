@@ -1,0 +1,2 @@
+env_id,model,source_model,training_stage,additional_training_timesteps,n_eval_episodes,mean_reward,std_reward,mean_episode_timesteps,std_episode_timesteps,training_time_seconds
+SailboatRace-v0,PPO,models/ppo/base/ppo_base_1M.zip,base_to_race,500000,20,548.6776339,26.11110693228609,1792.35,613.964277633908,684.3444209098816
