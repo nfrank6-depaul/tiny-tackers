@@ -34,10 +34,6 @@ RACE_MARKS = [
 TARGET_SEQUENCE = [
     WINDWARD_MARK,
     REACH_MARK,
-    LEEWARD_MARK,
-    WINDWARD_MARK,
-    LEEWARD_MARK,
-    WINDWARD_MARK,
 ]
 
 # Starting line: slightly windward of the leeward mark, extending to the right.
