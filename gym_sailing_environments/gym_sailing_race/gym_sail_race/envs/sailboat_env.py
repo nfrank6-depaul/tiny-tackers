@@ -136,7 +136,6 @@ class SailboatRaceEnv(BoatEnv):
             self.mark_index == len(self.TARGET_SEQUENCE) - 1
             and self._inside_rounding_zone(distance2target)
             and self._target_is_to_port()
-            and self._passed_halfway_into_final_zone(distance2target)
         )
 
     def step(self, action):
@@ -212,24 +211,32 @@ class SailboatRaceEnv(BoatEnv):
     
     def _make_finish_line(self):
         final_mark = self.TARGET_SEQUENCE[-1]
-        finish_y = final_mark[1] - 2.0
         line_length = 10.0
 
+        # Horizontal line above the buoy
+        if self.FINISH_LINE_SIDE == "above":
+            finish_y = min(50.0, final_mark[1] + 2.0)
+
+            return (
+                (final_mark[0] - line_length / 2, finish_y),
+                (final_mark[0] + line_length / 2, finish_y),
+            )
+
+        # Horizontal line to the left of the buoy
         if self.FINISH_LINE_SIDE == "left":
+            finish_y = final_mark[1] - 2.0
+
             return (
                 (max(0.0, final_mark[0] - line_length), finish_y),
                 (final_mark[0], finish_y),
             )
 
+        # Default: line to the right
+        finish_y = final_mark[1] - 2.0
+
         return (
             (final_mark[0], finish_y),
             (min(50.0, final_mark[0] + line_length), finish_y),
-        )
-    
-    def _passed_halfway_into_final_zone(self, distance2target):
-        return (
-            np.linalg.norm(distance2target)
-            < self.TARGET_RAD * 0.5
         )
 
     def reset(self, options=None, seed=None):
@@ -255,7 +262,7 @@ class SailboatRaceEnv2Mark(SailboatRaceEnv):
         WINDWARD_MARK,
         REACH_MARK,
     ]
-    FINISH_LINE_SIDE = "left"
+    FINISH_LINE_SIDE = "above"
     
 class SailboatDiscreteEnv(BoatDiscreteEnv):
     def __init__(self, render_mode=None):
