@@ -61,6 +61,7 @@ class SailboatRaceEnv(BoatEnv):
     MARK_REWARD = 50
     FINISH_REWARD = 100
     ROUNDING_ZONE_MULTIPLIER = 2.5
+    ADVANCE_ZONE_MULTIPLIER = 1.25 # make it easier to advance target
     INVALID_ROUNDING_PENALTY = 1.0
     VALID_PORT_ROUNDING_BONUS = 0.5
     EXIT_ZONE_PROGRESS_WEIGHT = 5.0
@@ -117,13 +118,24 @@ class SailboatRaceEnv(BoatEnv):
     def _inside_rounding_zone(self, distance2target):
         return np.linalg.norm(distance2target) < self.TARGET_RAD * self.ROUNDING_ZONE_MULTIPLIER
 
+    def _inside_advance_zone(self, distance2target):
+        return (
+            np.linalg.norm(distance2target)
+            < self.TARGET_RAD * self.ADVANCE_ZONE_MULTIPLIER
+        )
+
     def _target_hit_by_valid_rounding(self, distance2target):
         inside_rounding_zone = self._inside_rounding_zone(distance2target)
+        inside_advance_zone = self._inside_advance_zone(distance2target)
 
         if inside_rounding_zone and self._target_is_to_port():
             self.valid_port_rounding_started = True
 
-        if self.valid_port_rounding_started and not inside_rounding_zone:
+        if (
+            self.valid_port_rounding_started
+            and inside_advance_zone
+            and self._target_is_to_port()
+        ):
             self.valid_port_rounding_started = False
             return True
 
