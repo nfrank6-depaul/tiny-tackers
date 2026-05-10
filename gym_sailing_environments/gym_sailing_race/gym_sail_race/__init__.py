@@ -5,6 +5,11 @@ register(
     entry_point="gym_sail_race.envs:SailboatRaceEnv",
     max_episode_steps=20000,
 )
+register(
+    id="SailboatRaceJibePractice-v0",
+    entry_point="gym_sail_race.envs:SailboatRaceEnvJibePractice",
+    max_episode_steps=20000,
+)
 
 register(
     id="SailboatRace2Mark-v0",

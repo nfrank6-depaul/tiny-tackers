@@ -263,6 +263,34 @@ class SailboatRaceEnv2Mark(SailboatRaceEnv):
         REACH_MARK,
     ]
     FINISH_LINE_SIDE = "above"
+
+class SailboatRaceEnvJibePractice(SailboatRaceEnv):
+    TARGET_SEQUENCE = [
+        REACH_MARK,
+        LEEWARD_MARK,
+    ]
+    FINISH_LINE_SIDE = "right"
+
+    def reset(self, options=None, seed=None):
+        self.mark_index = 0
+        self.TARGET = self.TARGET_SEQUENCE[self.mark_index]
+        self.start_line = START_LINE
+        self.show_start_line = False
+        self.finish_line = self._make_finish_line()
+        self.prev_boat_y = None
+        self.valid_port_rounding_started = False
+
+        start_x, start_y = WINDWARD_MARK
+
+        self.boat = SailBoat(
+            x=start_x + self.np_random.uniform(-2.0, 2.0),
+            y=start_y + self.np_random.uniform(-2.0, 2.0),
+            heading=-np.pi / 2 + self.np_random.uniform(-0.4, 0.4),
+            heading_dot=self.np_random.uniform(-0.03, 0.03),
+            speed=self.np_random.uniform(-0.2, 0.5),
+        )
+
+        return BoatEnv.reset(self, options=options, seed=seed)
     
 class SailboatDiscreteEnv(BoatDiscreteEnv):
     def __init__(self, render_mode=None):
