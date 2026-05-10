@@ -331,7 +331,7 @@ class SailboatRaceEnvJibePractice(SailboatRaceEnv):
         self.boat = SailBoat(
             x=start_x + self.np_random.uniform(-2.0, 2.0),
             y=start_y + self.np_random.uniform(-2.0, 2.0),
-            heading=-np.pi / 2 + self.np_random.uniform(-0.4, 0.4),
+            heading=-np.pi / 2 + self.np_random.choice([-0.6, 0.6]) + self.np_random.uniform(-0.1, 0.1),
             heading_dot=self.np_random.uniform(-0.03, 0.03),
             speed=self.np_random.uniform(-0.2, 0.5),
         )
