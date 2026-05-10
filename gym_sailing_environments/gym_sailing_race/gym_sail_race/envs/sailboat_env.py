@@ -314,8 +314,8 @@ class SailboatRaceEnvJibePractice(SailboatRaceEnv):
     ]
     FINISH_LINE_SIDE = "right"
     REWARD_JIBES = True
-    JIBE_BONUS = 2.0
-    TACK_PENALTY = 2.0
+    JIBE_BONUS = 10.0
+    TACK_PENALTY = -20.0
 
     def reset(self, options=None, seed=None):
         self.mark_index = 0
