@@ -64,6 +64,7 @@ class SailboatRaceEnv(BoatEnv):
     INVALID_ROUNDING_PENALTY = 1.0
     VALID_PORT_ROUNDING_BONUS = 0.5
     EXIT_ZONE_PROGRESS_WEIGHT = 5.0
+    ACTION_PENALTY = 0.01
     FINISH_LINE_SIDE = "right"
 
     def __init__(self, render_mode=None):
@@ -205,7 +206,7 @@ class SailboatRaceEnv(BoatEnv):
                 reward -= self.INVALID_ROUNDING_PENALTY
 
             self.prev_distance2target = distance2target
-
+        reward -= self.ACTION_PENALTY * abs(self.last_action)
         self.last_reward = reward
         return terminated, reward
     
