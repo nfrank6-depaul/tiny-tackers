@@ -64,7 +64,9 @@ class SailboatRaceEnv(BoatEnv):
     INVALID_ROUNDING_PENALTY = 1.0
     VALID_PORT_ROUNDING_BONUS = 0.5
     EXIT_ZONE_PROGRESS_WEIGHT = 5.0
-    ACTION_PENALTY = 0.01
+    REWARD_JIBES = False
+    JIBE_BONUS = 0.0
+    TACK_PENALTY = 0.0
     FINISH_LINE_SIDE = "right"
 
     def __init__(self, render_mode=None):
@@ -141,7 +143,13 @@ class SailboatRaceEnv(BoatEnv):
 
     def step(self, action):
         previous_y = self.boat.y
+        previous_heading = self.boat.heading
+
         obs, reward, terminated, truncated, info = super().step(action)
+
+        current_heading = self.boat.heading
+        reward += self._maneuver_reward(previous_heading, current_heading)
+        self.last_reward = reward
 
         if self.show_start_line:
             line_start, _ = self.start_line
@@ -153,6 +161,41 @@ class SailboatRaceEnv(BoatEnv):
                 self.show_start_line = False
 
         return obs, reward, terminated, truncated, info
+
+    def _angle_diff(self, a, b):
+        return (a - b + np.pi) % (2 * np.pi) - np.pi
+
+    def _crossed_heading(self, previous_heading, current_heading, target_heading):
+        previous_side = np.sign(self._angle_diff(previous_heading, target_heading))
+        current_side = np.sign(self._angle_diff(current_heading, target_heading))
+
+        return previous_side != 0 and current_side != 0 and previous_side != current_side
+
+    def _maneuver_reward(self, previous_heading, current_heading):
+        if not self.REWARD_JIBES:
+            return 0.0
+
+        reward = 0.0
+
+        crossed_upwind = self._crossed_heading(
+            previous_heading,
+            current_heading,
+            np.pi / 2,
+        )
+
+        crossed_downwind = self._crossed_heading(
+            previous_heading,
+            current_heading,
+            -np.pi / 2,
+        )
+
+        if crossed_downwind:
+            reward += self.JIBE_BONUS
+
+        if crossed_upwind:
+            reward -= self.TACK_PENALTY
+
+        return reward
 
     def _advance_target(self):
         self.mark_index += 1
@@ -206,7 +249,6 @@ class SailboatRaceEnv(BoatEnv):
                 reward -= self.INVALID_ROUNDING_PENALTY
 
             self.prev_distance2target = distance2target
-        reward -= self.ACTION_PENALTY * abs(self.last_action)
         self.last_reward = reward
         return terminated, reward
     
@@ -271,6 +313,9 @@ class SailboatRaceEnvJibePractice(SailboatRaceEnv):
         LEEWARD_MARK,
     ]
     FINISH_LINE_SIDE = "right"
+    REWARD_JIBES = True
+    JIBE_BONUS = 2.0
+    TACK_PENALTY = 2.0
 
     def reset(self, options=None, seed=None):
         self.mark_index = 0
