@@ -7,6 +7,30 @@ register(
 )
 
 register(
+    id="SailboatUpwind-v0",
+    entry_point="gym_sailing.envs:SailboatEnvUpwind",
+    max_episode_steps=20000,
+)
+
+register(
+    id="SailboatDownwind-v0",
+    entry_point="gym_sailing.envs:SailboatEnvDownwind",
+    max_episode_steps=20000,
+)
+
+register(
+    id="SailboatReach-v0",
+    entry_point="gym_sailing.envs:SailboatEnvReach",
+    max_episode_steps=20000,
+)
+
+register(
+    id="SailboatTriangle-v0",
+    entry_point="gym_sailing.envs:SailboatEnvTriangle",
+    max_episode_steps=20000,
+)
+
+register(
     id="SailboatDiscrete-v0",
     entry_point="gym_sailing.envs:SailboatDiscreteEnv",
     max_episode_steps=3000,
