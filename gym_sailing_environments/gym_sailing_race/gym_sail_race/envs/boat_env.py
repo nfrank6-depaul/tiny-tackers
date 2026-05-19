@@ -64,6 +64,10 @@ class BoatEnv(gym.Env):
             False,
             {
                 "distance2target": np.linalg.norm(distance2target),
+                "mark_index": getattr(self, "mark_index", None),
+                "active_target": getattr(self, "TARGET", None),
+                "show_start_line": getattr(self, "show_start_line", None),
+                "show_finish_line": getattr(self, "show_finish_line", None),
             },
         )
 
