@@ -15,18 +15,18 @@ os.chdir(REPO_ROOT)
 GYM_SAILING_PARENT = os.path.join(
     REPO_ROOT,
     "gym_sailing_environments",
-    "gym_sailing_race",
+    "gym_sail_steps",
 )
 
 sys.path.insert(0, GYM_SAILING_PARENT)
 
-import gym_sail_race  # type: ignore
-print("Loaded gym_sail_race from:", gym_sail_race.__file__)
+import gym_sail_steps  # type: ignore
+print("Loaded gym_sail_steps from:", gym_sail_steps.__file__)
 
 builtins.quit = lambda *args, **kwargs: None
 
 
-ENV_ID = "SailboatRaceUpwind-v0"
+ENV_ID = "SailboatUpwind-v0"
 MAX_STEPS = 10_000
 RESULTS_DIR = "data/results"
 RESULTS_PATH = os.path.join(RESULTS_DIR, "human_race_score.csv")
