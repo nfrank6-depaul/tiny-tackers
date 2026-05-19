@@ -1,5 +1,4 @@
 from gym_sail_steps.envs.motorboat_env import MotorboatEnv
-from gym_sail_steps.envs.sailboat_env import SailboatEnv
 from gym_sail_steps.envs.sailboat_env import SailboatEnvUpwind
 from gym_sail_steps.envs.sailboat_env import SailboatEnvDownwind
 from gym_sail_steps.envs.sailboat_env import SailboatEnvReach
