@@ -50,14 +50,44 @@ class SailboatEnvUpwind(BoatEnv):
     
 
 class SailboatEnvDownwind(BoatEnv):
-    TARGET = (BoatEnv.COURSE_SIZE * COURSE_CENTER_X, BoatEnv.COURSE_SIZE * LEEWARD_Y)
+    LEEWARD_BUOY = (
+        BoatEnv.COURSE_SIZE * COURSE_CENTER_X,
+        BoatEnv.COURSE_SIZE * LEEWARD_Y,
+    )
+
+    ROUNDING_GATE = (
+        BoatEnv.COURSE_SIZE * (COURSE_CENTER_X - 0.025),
+        BoatEnv.COURSE_SIZE * (LEEWARD_Y - 0.015),
+    )
+
+    TARGET = ROUNDING_GATE
 
     def __init__(self, render_mode=None):
         super().__init__(render_mode)
 
+    def _render_frame(self):
+        return self.renderer._render_frame(
+            boats=[
+                (
+                    self.boat.x,
+                    self.boat.y,
+                    self.boat.heading - np.pi / 2,
+                    self.last_action,
+                )
+            ],
+            target=self.LEEWARD_BUOY,
+            gate=self.ROUNDING_GATE,
+            stepnum=self.stepnum,
+            reward=self.last_reward,
+            render_mode=self.render_mode,
+            fps=self.metadata["render_fps"],
+        )
+
     def reset(self, options=None, seed=None):
         self.boat = SailBoat(
-            x=self.COURSE_SIZE * (COURSE_CENTER_X + np.random.uniform(-0.15, 0.15)),
+            x=self.COURSE_SIZE * (
+                COURSE_CENTER_X + np.random.uniform(-0.15, 0.15)
+            ),
             y=self.COURSE_SIZE * WINDWARD_Y,
             heading=-np.pi / 2 + np.random.uniform(-0.75, 0.75),
             heading_dot=np.random.uniform(-0.03, 0.03),
