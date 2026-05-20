@@ -12,8 +12,8 @@ LEEWARD_Y = 0.15
 class SailboatEnvUpwind(BoatEnv):
     WINDWARD_BUOY = (BoatEnv.COURSE_SIZE * COURSE_CENTER_X, BoatEnv.COURSE_SIZE * WINDWARD_Y)
     ROUNDING_GATE = (
-        BoatEnv.COURSE_SIZE * (COURSE_CENTER_X + 0.05),
-        BoatEnv.COURSE_SIZE * (WINDWARD_Y + 0.03),
+        BoatEnv.COURSE_SIZE * (COURSE_CENTER_X + 0.025),
+        BoatEnv.COURSE_SIZE * (WINDWARD_Y + 0.015),
     )
     TARGET = ROUNDING_GATE
     def __init__(self, render_mode=None):

@@ -8,7 +8,7 @@ class Renderer:
     WATER_COLOR = (38, 102, 138)
     BOAT_COLOR = (220, 245, 230)
     # so I can se the gate
-    GATE_COLOR = (160, 160, 160)
+    GATE_COLOR = (80, 220, 100)
     TARGET_COLOR = (255, 150, 0)
     INFO_COLOR = (102, 160, 198)
     FONT_SIZE = 20
@@ -252,23 +252,13 @@ class Renderer:
         )
 
     def draw_gate(self, gate):
-        gate_x = int(self.scale * gate[0])
-        gate_y = int(self.scale * gate[1])
-        gate_size = max(5, int(self.target_rad * self.scale * 1.5))
+        gate_radius = max(3, int(self.target_rad * self.scale * 0.6))
 
-        pygame.draw.line(
+        pygame.draw.circle(
             self.window,
             Renderer.GATE_COLOR,
-            (gate_x - gate_size, gate_y - gate_size),
-            (gate_x + gate_size, gate_y + gate_size),
-            width=2,
-        )
-        pygame.draw.line(
-            self.window,
-            Renderer.GATE_COLOR,
-            (gate_x - gate_size, gate_y + gate_size),
-            (gate_x + gate_size, gate_y - gate_size),
-            width=2,
+            (int(self.scale * gate[0]), int(self.scale * gate[1])),
+            gate_radius,
         )
 
 
