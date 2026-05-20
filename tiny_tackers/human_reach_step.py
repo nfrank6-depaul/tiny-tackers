@@ -26,15 +26,15 @@ print("Loaded gym_sail_steps from:", gym_sail_steps.__file__)
 builtins.quit = lambda *args, **kwargs: None
 
 
-ENV_ID = "SailboatDownwind-v0"
+ENV_ID = "SailboatReach-v0"
 MAX_STEPS = 10_000
 RESULTS_DIR = "data/results"
 RESULTS_PATH = os.path.join(RESULTS_DIR, "human_race_score.csv")
 
-
+ 
 def get_human_action(env):
     pygame.event.pump()
-    keys = pygame.key.get_pressed()
+    keys = pygame.key.get_pressed() 
 
     steer = 0.0
 

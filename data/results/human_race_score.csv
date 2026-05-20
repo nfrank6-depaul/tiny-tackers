@@ -1,2 +1,2 @@
 agent,env_id,total_reward,timesteps
-Human Race,SailboatDownwind-v0,427.1336086776724,527
+Human Race,SailboatReach-v0,106.85316477261654,132
