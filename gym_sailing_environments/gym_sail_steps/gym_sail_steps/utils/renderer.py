@@ -241,15 +241,25 @@ class Renderer:
         )
 
     def draw_target(self, target):
-
-        # Draw the target
         target_radius = int(self.target_rad * self.scale)
-        pygame.draw.circle(
-            self.window,
-            Renderer.TARGET_COLOR,
-            (int(self.scale * target[0]), int(self.scale * target[1])),
-            target_radius,
-        )
+
+        target_array = np.array(target)
+
+        # Single target: shape is (2,)
+        if target_array.ndim == 1:
+            targets = [target_array]
+
+        # Multiple targets: shape is (n, 2)
+        else:
+            targets = target_array
+
+        for t in targets:
+            pygame.draw.circle(
+                self.window,
+                Renderer.TARGET_COLOR,
+                (int(self.scale * t[0]), int(self.scale * t[1])),
+                target_radius,
+            )
 
     def draw_gate(self, gate):
         gate_radius = max(3, int(self.target_rad * self.scale * 0.6))
