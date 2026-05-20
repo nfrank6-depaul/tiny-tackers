@@ -36,13 +36,24 @@ class SailBoat(Boat):
         head = self.heading - np.pi / 2
         if abs(norm(head)) < np.pi / 6:
             u = 4 * (norm(head) + np.pi / 6) * (norm(head) - np.pi / 6)
-
         elif norm(head) < np.pi / 6:
             u = 4 * np.cos(head + np.pi * 2 / 3)
-
         elif norm(head) > np.pi / 6:
             u = 4 * np.cos(head - np.pi * 2 / 3)
-        fdrive = u * apparent_wind_speed * self.SAILCOEFF * unit_vector(self.heading)
+        # upwind = 0 degrees, downwind = 180 degrees
+        angle_from_wind = abs(norm(self.heading - np.pi / 2))
+        # 160–180 degrees from wind gets only 80% drive
+        dead_downwind_start = np.deg2rad(160)
+        downwind_power = 1.0
+        if angle_from_wind >= dead_downwind_start:
+            downwind_power = 0.8
+        fdrive = (
+            downwind_power
+            * u
+            * apparent_wind_speed
+            * self.SAILCOEFF
+            * unit_vector(self.heading)
+        )
 
         vforward = np.dot(self.velocity, unit_heading) * unit_heading
         vperpendicular = self.velocity - vforward
