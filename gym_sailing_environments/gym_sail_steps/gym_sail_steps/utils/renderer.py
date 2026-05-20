@@ -7,6 +7,8 @@ import pygame
 class Renderer:
     WATER_COLOR = (38, 102, 138)
     BOAT_COLOR = (220, 245, 230)
+    # so I can se the gate
+    GATE_COLOR = (160, 160, 160)
     TARGET_COLOR = (255, 150, 0)
     INFO_COLOR = (102, 160, 198)
     FONT_SIZE = 20
@@ -50,7 +52,8 @@ class Renderer:
         self.window = None
         self.clock = None
 
-    def _render_frame(self, boats, target, stepnum, reward, render_mode, fps):
+    # added gate to the parameters
+    def _render_frame(self, boats, target, stepnum, reward, render_mode, fps, gate=None):
         if self.window is None and render_mode in ["human", "rgb_array"]:
             # FIXME: self.window should be used only in human mode,
             # in rgb mode there is no need to create a window, only the surface
@@ -67,6 +70,9 @@ class Renderer:
 
         self.draw_water()
         self.draw_target(target)
+        # draw gate
+        if gate is not None:
+            self.draw_gate(gate)
 
         for n, boat in enumerate(boats):
             if n == 0:  # for the first boat only, draw the trail
@@ -245,6 +251,27 @@ class Renderer:
             target_radius,
         )
 
+    def draw_gate(self, gate):
+        gate_x = int(self.scale * gate[0])
+        gate_y = int(self.scale * gate[1])
+        gate_size = max(5, int(self.target_rad * self.scale * 1.5))
+
+        pygame.draw.line(
+            self.window,
+            Renderer.GATE_COLOR,
+            (gate_x - gate_size, gate_y - gate_size),
+            (gate_x + gate_size, gate_y + gate_size),
+            width=2,
+        )
+        pygame.draw.line(
+            self.window,
+            Renderer.GATE_COLOR,
+            (gate_x - gate_size, gate_y + gate_size),
+            (gate_x + gate_size, gate_y - gate_size),
+            width=2,
+        )
+
+
     def close(self):
         if self.window is not None:
             import pygame
@@ -256,4 +283,4 @@ class Renderer:
 
 def norm(angle):
     return (angle + np.pi) % (2 * np.pi) - np.pi
-    return (angle + np.pi) % (2 * np.pi) - np.pi
+
