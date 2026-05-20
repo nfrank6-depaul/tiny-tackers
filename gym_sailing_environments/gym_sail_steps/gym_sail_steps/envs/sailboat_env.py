@@ -35,23 +35,52 @@ class SailboatEnvDownwind(BoatEnv):
 
         return super().reset(options, seed)
     
-class SailboatEnvReach(BoatEnv):
-    # Reach buoy: left side of the course, middle height
-    TARGET = (BoatEnv.COURSE_SIZE * 0.20, BoatEnv.COURSE_SIZE * 0.50)
+class SailboatEnvWindwardToReach(BoatEnv):
+    WINDWARD_BUOY = (BoatEnv.COURSE_SIZE * 0.50, BoatEnv.COURSE_SIZE * 0.90)
+    REACH_BUOY = (BoatEnv.COURSE_SIZE * 0.20, BoatEnv.COURSE_SIZE * 0.50)
+    TARGET = REACH_BUOY
     def __init__(self, render_mode=None):
         super().__init__(render_mode)
     def reset(self, options=None, seed=None):
-        target_y = self.TARGET[1]
+        windward_x, windward_y = self.WINDWARD_BUOY
         self.boat = SailBoat(
-            # Start on the right side
-            x=self.COURSE_SIZE * np.random.uniform(0.75, 0.90),
-            # Sometimes slightly upwind, sometimes slightly downwind of the reach buoy
-            y=target_y + self.COURSE_SIZE * np.random.uniform(-0.15, 0.15),
-            # Start roughly aimed leftward toward the reach buoy
+            # Start near windward mark
+            x=windward_x + self.COURSE_SIZE * np.random.uniform(-0.08, 0.08),
+            # Slightly below windward mark
+            y=windward_y - self.COURSE_SIZE * np.random.uniform(0.03, 0.10),
+            # Roughly pointed toward reach mark
             heading=np.pi + np.random.uniform(-0.75, 0.75),
             heading_dot=np.random.uniform(-0.03, 0.03),
             speed=np.random.uniform(0, 0.5),
         )
+        return super().reset(options, seed)
+    
+class SailboatEnvReachToDownwind(BoatEnv):
+    REACH_BUOY = (BoatEnv.COURSE_SIZE * 0.20, BoatEnv.COURSE_SIZE * 0.50)
+    LEEWARD_BUOY = (BoatEnv.COURSE_SIZE * 0.50, BoatEnv.COURSE_SIZE * 0.10)
+
+    TARGET = LEEWARD_BUOY
+
+    def __init__(self, render_mode=None):
+        super().__init__(render_mode)
+
+    def reset(self, options=None, seed=None):
+        reach_x, reach_y = self.REACH_BUOY
+
+        self.boat = SailBoat(
+            # Start near the reach mark
+            x=reach_x + self.COURSE_SIZE * np.random.uniform(-0.08, 0.08),
+
+            # Slightly above/below the reach mark
+            y=reach_y + self.COURSE_SIZE * np.random.uniform(-0.08, 0.08),
+
+            # Roughly pointed toward the leeward/downwind mark
+            heading=-np.pi / 4 + np.random.uniform(-0.75, 0.75),
+
+            heading_dot=np.random.uniform(-0.03, 0.03),
+            speed=np.random.uniform(0, 0.5),
+        )
+
         return super().reset(options, seed)
 
 

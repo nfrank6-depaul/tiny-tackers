@@ -26,7 +26,7 @@ print("Loaded gym_sail_steps from:", gym_sail_steps.__file__)
 builtins.quit = lambda *args, **kwargs: None
 
 
-ENV_ID = "SailboatReach-v0"
+ENV_ID = "SailboatReachToDownwind-v0"
 MAX_STEPS = 10_000
 RESULTS_DIR = "data/results"
 RESULTS_PATH = os.path.join(RESULTS_DIR, "human_race_score.csv")

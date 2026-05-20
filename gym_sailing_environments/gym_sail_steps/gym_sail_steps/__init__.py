@@ -13,8 +13,20 @@ register(
 )
 
 register(
-    id="SailboatReach-v0",
-    entry_point="gym_sail_steps.envs:SailboatEnvReach",
+    id="SailboatWindwardToReach-v0",
+    entry_point="gym_sail_steps.envs:SailboatEnvWindwardToReach",
+    max_episode_steps=10000,
+)
+
+register(
+    id="SailboatWindwardToReach-v0",
+    entry_point="gym_sail_steps.envs:SailboatEnvWindwardToReach",
+    max_episode_steps=10000,
+)
+
+register(
+    id="SailboatReachToDownwind-v0",
+    entry_point="gym_sail_steps.envs:SailboatEnvReachToDownwind",
     max_episode_steps=10000,
 )
 
