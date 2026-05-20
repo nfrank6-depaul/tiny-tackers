@@ -1,0 +1,2 @@
+env_id,model,training_timesteps,n_eval_episodes,mean_reward,std_reward,mean_episode_timesteps,std_episode_timesteps,training_time_seconds
+SailboatUpwind-v0,PPO,500000,20,232.9041455,11.652321845767075,2049.6,117.07685285180932,675.0346229076385
