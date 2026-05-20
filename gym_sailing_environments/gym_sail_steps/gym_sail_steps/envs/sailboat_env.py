@@ -4,17 +4,20 @@ from gym_sail_steps.envs.boat_env import BoatEnv
 from gym_sail_steps.physics.sailboat import SailBoat
 
 COURSE_CENTER_X = 0.62
-REACH_X = 0.25
+REACH_X = 0.20
+WINDWARD_Y = 0.85
+REACH_Y = 0.50
+LEEWARD_Y = 0.15
 
 class SailboatEnvUpwind(BoatEnv):
-    TARGET = (BoatEnv.COURSE_SIZE * COURSE_CENTER_X, BoatEnv.COURSE_SIZE * 0.90)
+    TARGET = (BoatEnv.COURSE_SIZE * COURSE_CENTER_X, BoatEnv.COURSE_SIZE * WINDWARD_Y)
     def __init__(self, render_mode=None):
         super().__init__(render_mode)
 
     def reset(self, options=None, seed=None):
         self.boat = SailBoat(
             x=self.COURSE_SIZE * (COURSE_CENTER_X + np.random.uniform(-0.15, 0.15)),
-            y=self.COURSE_SIZE * 0.10,
+            y=self.COURSE_SIZE * LEEWARD_Y,
             heading=self.np_random.random() * np.pi * 2,
             heading_dot=np.random.uniform(-0.03, 0.03),
             speed=np.random.uniform(-1, 0.5),
@@ -22,7 +25,7 @@ class SailboatEnvUpwind(BoatEnv):
         return super().reset(options, seed)
 
 class SailboatEnvDownwind(BoatEnv):
-    TARGET = (BoatEnv.COURSE_SIZE * COURSE_CENTER_X, BoatEnv.COURSE_SIZE * 0.10)
+    TARGET = (BoatEnv.COURSE_SIZE * COURSE_CENTER_X, BoatEnv.COURSE_SIZE * LEEWARD_Y)
 
     def __init__(self, render_mode=None):
         super().__init__(render_mode)
@@ -30,7 +33,7 @@ class SailboatEnvDownwind(BoatEnv):
     def reset(self, options=None, seed=None):
         self.boat = SailBoat(
             x=self.COURSE_SIZE * (COURSE_CENTER_X + np.random.uniform(-0.15, 0.15)),
-            y=self.COURSE_SIZE * 0.90,
+            y=self.COURSE_SIZE * WINDWARD_Y,
             heading=-np.pi / 2 + np.random.uniform(-0.75, 0.75),
             heading_dot=np.random.uniform(-0.03, 0.03),
             speed=np.random.uniform(0, 0.5),
@@ -39,8 +42,8 @@ class SailboatEnvDownwind(BoatEnv):
         return super().reset(options, seed)
     
 class SailboatEnvWindwardToReach(BoatEnv):
-    WINDWARD_BUOY = (BoatEnv.COURSE_SIZE * COURSE_CENTER_X, BoatEnv.COURSE_SIZE * 0.90)
-    REACH_BUOY = (BoatEnv.COURSE_SIZE * REACH_X, BoatEnv.COURSE_SIZE * 0.50)
+    WINDWARD_BUOY = (BoatEnv.COURSE_SIZE * COURSE_CENTER_X, BoatEnv.COURSE_SIZE * WINDWARD_Y)
+    REACH_BUOY = (BoatEnv.COURSE_SIZE * REACH_X, BoatEnv.COURSE_SIZE * REACH_Y)
     TARGET = REACH_BUOY
     def __init__(self, render_mode=None):
         super().__init__(render_mode)
@@ -59,8 +62,8 @@ class SailboatEnvWindwardToReach(BoatEnv):
         return super().reset(options, seed)
     
 class SailboatEnvReachToDownwind(BoatEnv):
-    REACH_BUOY = (BoatEnv.COURSE_SIZE * REACH_X, BoatEnv.COURSE_SIZE * 0.50)
-    LEEWARD_BUOY = (BoatEnv.COURSE_SIZE * COURSE_CENTER_X, BoatEnv.COURSE_SIZE * 0.10)
+    REACH_BUOY = (BoatEnv.COURSE_SIZE * REACH_X, BoatEnv.COURSE_SIZE * REACH_Y)
+    LEEWARD_BUOY = (BoatEnv.COURSE_SIZE * COURSE_CENTER_X, BoatEnv.COURSE_SIZE * LEEWARD_Y)
     TARGET = LEEWARD_BUOY
 
     def __init__(self, render_mode=None):
@@ -87,9 +90,9 @@ class SailboatEnvReachToDownwind(BoatEnv):
 
 
 class SailboatEnvTriangle(BoatEnv):
-    WINDWARD_BUOY = (BoatEnv.COURSE_SIZE * COURSE_CENTER_X, BoatEnv.COURSE_SIZE * 0.90)
-    REACH_BUOY = (BoatEnv.COURSE_SIZE * REACH_X, BoatEnv.COURSE_SIZE * 0.50)
-    LEEWARD_BUOY = (BoatEnv.COURSE_SIZE * COURSE_CENTER_X, BoatEnv.COURSE_SIZE * 0.10)
+    WINDWARD_BUOY = (BoatEnv.COURSE_SIZE * COURSE_CENTER_X, BoatEnv.COURSE_SIZE * WINDWARD_Y)
+    REACH_BUOY = (BoatEnv.COURSE_SIZE * REACH_X, BoatEnv.COURSE_SIZE * REACH_Y)
+    LEEWARD_BUOY = (BoatEnv.COURSE_SIZE * COURSE_CENTER_X, BoatEnv.COURSE_SIZE * LEEWARD_Y)
     COURSE = [
         WINDWARD_BUOY,
         REACH_BUOY,
