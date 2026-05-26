@@ -7,8 +7,10 @@ import pygame
 class Renderer:
     WATER_COLOR = (38, 102, 138)
     BOAT_COLOR = (220, 245, 230)
-    # so I can se the gate
+
+    # so I can see the gate
     GATE_COLOR = (80, 220, 100)
+
     TARGET_COLOR = (255, 150, 0)
     INFO_COLOR = (102, 160, 198)
     FONT_SIZE = 20
@@ -22,13 +24,13 @@ class Renderer:
     ):
         self.boat_length = boat_length
         self.boat_beam = boat_beam
-        self.target_rad = 0.3 * target_radius  # TODO: get a better fix for this 0.3
+        self.target_rad = 0.3 * target_radius
         self.course_size = course_size
 
         self.screen_width = 680
 
-        self.scale = self.screen_width / (self.course_size)
-        self.screen_height = int(self.scale * (self.course_size))
+        self.scale = self.screen_width / self.course_size
+        self.screen_height = int(self.scale * self.course_size)
 
         pygame.font.init()
         self.normal_font = pygame.font.SysFont("monospace", 20)
@@ -38,48 +40,79 @@ class Renderer:
 
         path = os.path.dirname(os.path.abspath(__file__))
 
-        self.boat_img = pygame.image.load(os.path.join(path, "assets/laser.png"))
+        self.boat_img = pygame.image.load(
+            os.path.join(path, "assets/laser.png")
+        )
 
         self.boat_img = pygame.transform.scale(
-            self.boat_img, (boatwidth * 20, boatlength * 20)
+            self.boat_img,
+            (boatwidth * 20, boatlength * 20),
         )
-        self.sail_img = pygame.image.load(os.path.join(path, "assets/sail.png"))
+
+        self.sail_img = pygame.image.load(
+            os.path.join(path, "assets/sail.png")
+        )
+
         self.sail_img = pygame.transform.scale(
-            self.sail_img, (boatwidth * 20, 1.505 * boatlength * 20)
+            self.sail_img,
+            (boatwidth * 20, 1.505 * boatlength * 20),
         )
+
         self.trail = []
 
         self.window = None
         self.clock = None
 
     # added gate to the parameters
-    def _render_frame(self, boats, target, stepnum, reward, render_mode, fps, gate=None):
+    def _render_frame(
+        self,
+        boats,
+        target,
+        stepnum,
+        reward,
+        render_mode,
+        fps,
+        gate=None,
+    ):
         if self.window is None and render_mode in ["human", "rgb_array"]:
-            # FIXME: self.window should be used only in human mode,
-            # in rgb mode there is no need to create a window, only the surface
-            # the surface should be separated from the window
+
             pygame.init()
-            pygame.display.init()
-            self.window = pygame.display.set_mode(
-                (self.screen_width, self.screen_height)
-            )
-            pygame.display.set_caption("Boat Environment")
+
+            if render_mode == "human":
+                pygame.display.init()
+
+                self.window = pygame.display.set_mode(
+                    (self.screen_width, self.screen_height)
+                )
+
+                pygame.display.set_caption("Boat Environment")
+
+            elif render_mode == "rgb_array":
+                # IMPORTANT:
+                # Use off-screen surface for Colab/headless video recording
+                self.window = pygame.Surface(
+                    (self.screen_width, self.screen_height)
+                )
 
         if self.clock is None and render_mode == "human":
             self.clock = pygame.time.Clock()
 
         self.draw_water()
         self.draw_target(target)
+
         # draw gate
         if gate is not None:
             self.draw_gate(gate)
 
         for n, boat in enumerate(boats):
-            if n == 0:  # for the first boat only, draw the trail
+
+            # for the first boat only, draw the trail
+            if n == 0:
                 self.draw_trail(boat)
 
             boat_heading = boat[2]
             boat_pos = (boat[0], boat[1])
+
             if len(boat) > 3:
                 rudder = -0.5 * boat[3]
             else:
@@ -87,18 +120,31 @@ class Renderer:
 
             if len(boat) > 4:
                 boat_type = boat[4]
-                assert boat_type in ["sailboat", "motorboat", "iceboat"]
+                assert boat_type in [
+                    "sailboat",
+                    "motorboat",
+                    "iceboat",
+                ]
             else:
                 boat_type = "sailboat"
 
             self.draw_boat(
-                boat_pos, boat_heading, rudder, self.boat_color(n), boat_type
+                boat_pos,
+                boat_heading,
+                rudder,
+                self.boat_color(n),
+                boat_type,
             )
 
-        self.window.blit(pygame.transform.flip(self.window, False, True), (0, 0))
+        self.window.blit(
+            pygame.transform.flip(self.window, False, True),
+            (0, 0),
+        )
+
         self.draw_info(stepnum, reward)
 
         if render_mode == "human":
+
             pygame.display.flip()
             pygame.event.pump()
             pygame.display.update()
@@ -111,13 +157,20 @@ class Renderer:
             self.clock.tick(fps)
 
         elif render_mode == "rgb_array":
-            return pygame.surfarray.array3d(self.window).transpose(1, 0, 2)
+
+            return pygame.surfarray.array3d(
+                self.window
+            ).transpose(1, 0, 2)
 
     def draw_trail(self, boat):
+
         self.trail.append((boat[0], boat[1]))
+
         if len(self.trail) > 300:
             self.trail.pop(0)
+
         for i in range(len(self.trail) - 1):
+
             pygame.draw.aaline(
                 self.window,
                 self.BOAT_COLOR,
@@ -132,8 +185,10 @@ class Renderer:
             )
 
     def boat_color(self, n):
+
         if n == 0:
             return self.BOAT_COLOR
+
         color = (
             130 + (19016231 * n) % 77,
             130 + (44162351 * n) % 72,
@@ -146,46 +201,102 @@ class Renderer:
         self.window.fill(Renderer.WATER_COLOR)
 
     def draw_info(self, stepnum, reward):
+
         info_label = self.normal_font.render(
             f"step:{stepnum:4} reward:{reward:+4.2f}",
             True,
             Renderer.INFO_COLOR,
         )
-        self.window.blit(info_label, (7, self.screen_height - 25))
+
+        self.window.blit(
+            info_label,
+            (7, self.screen_height - 25),
+        )
 
     def draw_boat(
-        self, boat_pos, boat_heading, rudder, color=None, boat_type="sailboat"
+        self,
+        boat_pos,
+        boat_heading,
+        rudder,
+        color=None,
+        boat_type="sailboat",
     ):
+
         delta = (
-            -np.array([np.sin(boat_heading), np.cos(-boat_heading)])
+            -np.array(
+                [
+                    np.sin(boat_heading),
+                    np.cos(-boat_heading),
+                ]
+            )
             * 0.24
             * self.boat_length
             * self.scale
         )
-        self.draw_hull(boat_pos, boat_heading, color)
-        if boat_type == "sailboat":
-            self.draw_sail(boat_pos, boat_heading, delta)
-        self.draw_rudder(boat_pos, boat_heading, rudder, delta)
 
-    def draw_hull(self, boat_pos, boat_heading, color):
+        self.draw_hull(
+            boat_pos,
+            boat_heading,
+            color,
+        )
+
+        if boat_type == "sailboat":
+            self.draw_sail(
+                boat_pos,
+                boat_heading,
+                delta,
+            )
+
+        self.draw_rudder(
+            boat_pos,
+            boat_heading,
+            rudder,
+            delta,
+        )
+
+    def draw_hull(
+        self,
+        boat_pos,
+        boat_heading,
+        color,
+    ):
+
         boat_img = pygame.transform.rotozoom(
-            self.boat_img, np.degrees(-boat_heading), 0.05
+            self.boat_img,
+            np.degrees(-boat_heading),
+            0.05,
         )
 
         boat_rect = boat_img.get_rect()
+
         boat_rect.center = (
             int(boat_pos[0] * self.scale),
             int(boat_pos[1] * self.scale),
         )
 
         if color is not None:
-            boat_img.fill(color, special_flags=pygame.BLEND_RGB_MULT)
+            boat_img.fill(
+                color,
+                special_flags=pygame.BLEND_RGB_MULT,
+            )
 
-        self.window.blit(boat_img, boat_rect)
+        self.window.blit(
+            boat_img,
+            boat_rect,
+        )
 
-    def draw_sail(self, boat_pos, boat_heading, delta):
+    def draw_sail(
+        self,
+        boat_pos,
+        boat_heading,
+        delta,
+    ):
+
         norm_heading = norm(boat_heading)
-        if abs(norm_heading) < 0.5:  # replace by line
+
+        # replace by line
+        if abs(norm_heading) < 0.5:
+
             pygame.draw.aaline(
                 self.window,
                 (0, 0, 0),
@@ -200,13 +311,23 @@ class Renderer:
             )
 
         else:
+
             if norm_heading > 0:
-                sail_img = pygame.transform.flip(self.sail_img, True, False)
+
+                sail_img = pygame.transform.flip(
+                    self.sail_img,
+                    True,
+                    False,
+                )
+
                 sail_img = pygame.transform.rotozoom(
-                    sail_img, np.degrees(-0.45 * (norm_heading + 0.92)), 0.05
+                    sail_img,
+                    np.degrees(-0.45 * (norm_heading + 0.92)),
+                    0.05,
                 )
 
             else:
+
                 sail_img = pygame.transform.rotozoom(
                     self.sail_img.copy(),
                     np.degrees(-0.45 * (norm_heading - 0.92)),
@@ -217,11 +338,24 @@ class Renderer:
                 boat_pos[0] * self.scale + delta[0],
                 boat_pos[1] * self.scale - delta[1],
             )
-            self.window.blit(sail_img, sail_img.get_rect(center=pos))
 
-    def draw_rudder(self, boat_pos, boat_heading, rudder, delta):
+            self.window.blit(
+                sail_img,
+                sail_img.get_rect(center=pos),
+            )
+
+    def draw_rudder(
+        self,
+        boat_pos,
+        boat_heading,
+        rudder,
+        delta,
+    ):
+
         rudder_angle = boat_heading - rudder
+
         rudder_length = 0.4 * self.boat_beam * self.scale
+
         pygame.draw.line(
             self.window,
             (0, 0, 0),
@@ -241,46 +375,58 @@ class Renderer:
         )
 
     def draw_target(self, target):
+
         target_radius = int(self.target_rad * self.scale)
 
         target_array = np.array(target)
 
-        # Single target: shape is (2,)
+        # Single target
         if target_array.ndim == 1:
             targets = [target_array]
 
-        # Multiple targets: shape is (n, 2)
+        # Multiple targets
         else:
             targets = target_array
 
         for t in targets:
+
             pygame.draw.circle(
                 self.window,
                 Renderer.TARGET_COLOR,
-                (int(self.scale * t[0]), int(self.scale * t[1])),
+                (
+                    int(self.scale * t[0]),
+                    int(self.scale * t[1]),
+                ),
                 target_radius,
             )
 
     def draw_gate(self, gate):
-        gate_radius = max(3, int(self.target_rad * self.scale * 0.6))
+
+        gate_radius = max(
+            3,
+            int(self.target_rad * self.scale * 0.6),
+        )
 
         pygame.draw.circle(
             self.window,
             Renderer.GATE_COLOR,
-            (int(self.scale * gate[0]), int(self.scale * gate[1])),
+            (
+                int(self.scale * gate[0]),
+                int(self.scale * gate[1]),
+            ),
             gate_radius,
         )
 
-
     def close(self):
+
         if self.window is not None:
-            import pygame
 
             pygame.display.quit()
             pygame.quit()
-            quit()
+
+            self.window = None
+            self.clock = None
 
 
 def norm(angle):
     return (angle + np.pi) % (2 * np.pi) - np.pi
-
