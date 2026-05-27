@@ -62,8 +62,9 @@ class SailboatEnvDownwind(BoatEnv):
 
     TARGET = ROUNDING_GATE
 
-    UPWIND_HEADING_PENALTY = 2.0
     JIBE_BONUS = 5.0
+    MAX_UPWIND_FROM_DOWNWIND = np.pi / 2
+    TOO_FAR_UPWIND_TERMINATION_PENALTY = -100
 
     def __init__(self, render_mode=None):
         super().__init__(render_mode)
@@ -75,8 +76,12 @@ class SailboatEnvDownwind(BoatEnv):
     def _angle_diff(self, a, b):
         return (a - b + np.pi) % (2 * np.pi) - np.pi
 
-    def _is_near_upwind(self):
-        return abs(self._angle_diff(self.boat.heading, np.pi / 2)) < 0.6
+    def _is_too_far_upwind_for_downwind_leg(self):
+        downwind_heading = 3 * np.pi / 2
+        angle_from_downwind = abs(
+            self._angle_diff(self.boat.heading, downwind_heading)
+        )
+        return angle_from_downwind > self.MAX_UPWIND_FROM_DOWNWIND
 
     def _crossed_downwind(self, previous_heading, current_heading):
         downwind_heading = 3 * np.pi / 2
@@ -94,14 +99,14 @@ class SailboatEnvDownwind(BoatEnv):
         self.last_action = action[0]
 
         self.boat.command(action[0])
-
         self._normalize_heading()
+
         current_heading = self.boat.heading
 
         obs, distance2target = self._get_obs()
         terminated, reward = self._get_reward(distance2target)
 
-        if self._crossed_downwind(previous_heading, current_heading):
+        if not terminated and self._crossed_downwind(previous_heading, current_heading):
             reward += self.JIBE_BONUS
             self.jibe_count += 1
 
@@ -125,8 +130,9 @@ class SailboatEnvDownwind(BoatEnv):
     def _get_reward(self, distance2target):
         terminated, reward = super()._get_reward(distance2target)
 
-        if self._is_near_upwind():
-            reward -= self.UPWIND_HEADING_PENALTY
+        if self._is_too_far_upwind_for_downwind_leg():
+            reward = self.TOO_FAR_UPWIND_TERMINATION_PENALTY
+            terminated = True
 
         self.last_reward = reward
         return terminated, reward
