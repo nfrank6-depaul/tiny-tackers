@@ -64,7 +64,7 @@ class SailboatEnvDownwind(BoatEnv):
 
     JIBE_BONUS = 5.0
     MAX_UPWIND_FROM_DOWNWIND = np.pi / 2
-    TOO_FAR_UPWIND_TERMINATION_PENALTY = -100
+    TOO_FAR_UPWIND_PENALTY = 5.0
 
     def __init__(self, render_mode=None):
         super().__init__(render_mode)
@@ -90,6 +90,90 @@ class SailboatEnvDownwind(BoatEnv):
         current_side = np.sign(self._angle_diff(current_heading, downwind_heading))
 
         return previous_side != 0 and current_side != 0 and previous_side != current_side
+
+    def step(self, action):
+        previous_heading = self.boat.heading
+
+        self.stepnum += 1
+        action = np.clip(action, -1, 1)
+        self.last_action = action[0]
+
+        self.boat.command(action[0])
+        self._normalize_heading()
+
+        current_heading = self.boat.heading
+
+        obs, distance2target = self._get_obs()
+        terminated, reward = self._get_reward(distance2target)
+
+        if not terminated and self._crossed_downwind(previous_heading, current_heading):
+            reward += self.JIBE_BONUS
+            self.jibe_count += 1
+
+        self.last_reward = reward
+
+        if self.render_mode == "human":
+            self._render_frame()
+
+        return (
+            obs,
+            reward,
+            terminated,
+            False,
+            {
+                "distance2target": np.linalg.norm(distance2target),
+                "heading": self.boat.heading,
+                "jibe_count": self.jibe_count,
+            },
+        )
+
+    def _get_reward(self, distance2target):
+        terminated, reward = super()._get_reward(distance2target)
+
+        if self._is_too_far_upwind_for_downwind_leg():
+            reward -= self.TOO_FAR_UPWIND_PENALTY
+
+        self.last_reward = reward
+        return terminated, reward
+
+    def _render_frame(self):
+        return self.renderer._render_frame(
+            boats=[
+                (
+                    self.boat.x,
+                    self.boat.y,
+                    self.boat.heading - np.pi / 2,
+                    self.last_action,
+                )
+            ],
+            target=self.LEEWARD_BUOY,
+            gate=self.ROUNDING_GATE,
+            stepnum=self.stepnum,
+            reward=self.last_reward,
+            render_mode=self.render_mode,
+            fps=self.metadata["render_fps"],
+        )
+
+    def reset(self, options=None, seed=None):
+        self.jibe_count = 0
+
+        self.boat = SailBoat(
+            x=self.COURSE_SIZE * (
+                COURSE_CENTER_X + self.np_random.uniform(-0.05, 0.05)
+            ),
+            y=self.COURSE_SIZE * WINDWARD_Y,
+            heading=(
+                3 * np.pi / 2
+                + self.np_random.choice([-0.2, 0.2])
+                + self.np_random.uniform(-0.05, 0.05)
+            ),
+            heading_dot=self.np_random.uniform(-0.03, 0.03),
+            speed=self.np_random.uniform(0, 0.5),
+        )
+
+        self._normalize_heading()
+
+        return super().reset(options, seed)
 
     def step(self, action):
         previous_heading = self.boat.heading
