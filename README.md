@@ -37,6 +37,10 @@ The project is inspired by real-world dinghy sailing, autonomous sailing researc
 
 The main differences included in my evironments were buoy placement, moving the goal position off the buoy itself, implementing reward curations per task, and altering the start and finish positions and requirements
 
+Small adjustments were made to boat_env.py, the physics folder, and the renderer to accomodate video recording, graphics, and more realistic sailing, like the addition of a "dead downwind zone" that reduces speed when heading straight downwind.
+
+The following environments were trained in the order you see them, but I was unsuccessful in geting the boat to jibe. 
+
 - SailboatUpwind-v0 
     - Similar environment to Gabo Tor's baseline, only there is a more realistic target (called a rounding gate) that emmulates where you'd want to be positioned in a race
 - SailboatWindwardToReach-v0 
@@ -44,7 +48,7 @@ The main differences included in my evironments were buoy placement, moving the 
 - SailboatReachToDownwind-v0 
     - This environment simulates the third leg of a traingle race, going from the reach buoy to the leeward buoy
 - SailboatReachRounding-v0 
-    - This environment attemps to force the agents to learn jibing behavior (this is where I need help from you!)
+    - This environment attemps to force the agents to learn jibing behavior, currently, there is a large negative reward in this environment for turning upwind that has had little effect on helping the agent learn jibing behavior (this is where I need help from you!)
 - SailboatDownwind-v0 
     - This environment simulates the downwind portion of a triangle race as we have already learned the upwind portion
 - SailboatTriangle-v0 
