@@ -132,10 +132,10 @@ This project experiments with:
 
 Relevant papers and resources include:
 
-- Proximal Policy Optimization Algorithms
-- Trust Region Policy Optimization
-- Stable-Baselines3
-- AI-Based Autonomous Sailboat Navigation: A Review
+- Proximal Policy Optimization Algorithms http://arxiv.org/abs/1707.06347
+- Trust Region Policy Optimization https://proceedings.mlr.press/v37/schulman15.html
+- Stable-Baselines3 http://jmlr.org/papers/v22/20-1364.html
+- AI-Based Autonomous Sailboat Navigation: A Review https://doi.org/10.1002/rob.70004
 
 ---
 
@@ -147,6 +147,8 @@ MIT License
 
 # Author
 
-Nikki Frank
+Nicole Frank
+
+05/27/2026
 
 MS Artificial Intelligence — DePaul University
