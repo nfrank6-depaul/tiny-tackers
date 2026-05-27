@@ -62,11 +62,13 @@ class SailboatEnvDownwind(BoatEnv):
 
     TARGET = ROUNDING_GATE
 
-    UPWIND_HEADING_PENALTY = 2.0
-    SPIN_PENALTY = 5.0
+    UPWIND_HEADING_PENALTY = 1.0
 
     def __init__(self, render_mode=None):
         super().__init__(render_mode)
+
+    def _normalize_heading(self):
+        self.boat.heading = self.boat.heading % (2 * np.pi)
 
     def _angle_diff(self, a, b):
         return (a - b + np.pi) % (2 * np.pi) - np.pi
@@ -74,14 +76,38 @@ class SailboatEnvDownwind(BoatEnv):
     def _is_near_upwind(self):
         return abs(self._angle_diff(self.boat.heading, np.pi / 2)) < 0.6
 
+    def step(self, action):
+        self.stepnum += 1
+        action = np.clip(action, -1, 1)
+        self.last_action = action[0]
+
+        self.boat.command(action[0])
+
+        # Keep heading in 0 to 2π range instead of letting it grow forever
+        self._normalize_heading()
+
+        obs, distance2target = self._get_obs()
+        terminated, reward = self._get_reward(distance2target)
+
+        if self.render_mode == "human":
+            self._render_frame()
+
+        return (
+            obs,
+            reward,
+            terminated,
+            False,
+            {
+                "distance2target": np.linalg.norm(distance2target),
+                "heading": self.boat.heading,
+            },
+        )
+
     def _get_reward(self, distance2target):
         terminated, reward = super()._get_reward(distance2target)
 
         if self._is_near_upwind():
             reward -= self.UPWIND_HEADING_PENALTY
-
-        if abs(self.boat.heading_dot) > 0.25:
-            reward -= self.SPIN_PENALTY
 
         self.last_reward = reward
         return terminated, reward
@@ -107,13 +133,15 @@ class SailboatEnvDownwind(BoatEnv):
     def reset(self, options=None, seed=None):
         self.boat = SailBoat(
             x=self.COURSE_SIZE * (
-                COURSE_CENTER_X + np.random.uniform(-0.15, 0.15)
+                COURSE_CENTER_X + self.np_random.uniform(-0.15, 0.15)
             ),
             y=self.COURSE_SIZE * WINDWARD_Y,
-            heading=-np.pi / 2 + np.random.uniform(-0.75, 0.75),
-            heading_dot=np.random.uniform(-0.03, 0.03),
-            speed=np.random.uniform(0, 0.5),
+            heading=3 * np.pi / 2 + self.np_random.uniform(-0.75, 0.75),
+            heading_dot=self.np_random.uniform(-0.03, 0.03),
+            speed=self.np_random.uniform(0, 0.5),
         )
+
+        self._normalize_heading()
 
         return super().reset(options, seed)
     
