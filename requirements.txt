@@ -1,0 +1,6 @@
+gymnasium==1.2.3
+numpy==2.4.6
+pandas==3.0.3
+protobuf==7.35.0
+pygame==2.6.1
+stable_baselines3==2.8.0

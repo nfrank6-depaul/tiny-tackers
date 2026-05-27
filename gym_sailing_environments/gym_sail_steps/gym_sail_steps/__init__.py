@@ -36,8 +36,3 @@ register(
     max_episode_steps=10000,
 )
 
-register(
-    id="Motorboat-v0",
-    entry_point="gym_sail_steps.envs:MotorboatEnv",
-    max_episode_steps=10000,
-)
