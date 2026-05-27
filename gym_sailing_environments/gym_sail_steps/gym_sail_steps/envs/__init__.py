@@ -4,5 +4,6 @@ from gym_sail_steps.envs.sailboat_env import SailboatEnvDownwind
 from gym_sail_steps.envs.sailboat_env import SailboatEnvWindwardToReach
 from gym_sail_steps.envs.sailboat_env import SailboatEnvReachToDownwind
 from gym_sail_steps.envs.sailboat_env import SailboatEnvTriangle
+from gym_sail_steps.envs.sailboat_env import SailboatEnvReachRounding
 from gym_sail_steps.envs.boat_env import BoatEnv
 from gym_sail_steps.envs.boat_env import BoatDiscreteEnv
