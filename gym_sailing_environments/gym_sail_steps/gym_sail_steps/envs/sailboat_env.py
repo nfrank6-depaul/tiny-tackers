@@ -63,9 +63,11 @@ class SailboatEnvDownwind(BoatEnv):
     TARGET = ROUNDING_GATE
 
     UPWIND_HEADING_PENALTY = 2.0
+    JIBE_BONUS = 5.0
 
     def __init__(self, render_mode=None):
         super().__init__(render_mode)
+        self.jibe_count = 0
 
     def _normalize_heading(self):
         self.boat.heading = self.boat.heading % (2 * np.pi)
@@ -76,18 +78,34 @@ class SailboatEnvDownwind(BoatEnv):
     def _is_near_upwind(self):
         return abs(self._angle_diff(self.boat.heading, np.pi / 2)) < 0.6
 
+    def _crossed_downwind(self, previous_heading, current_heading):
+        downwind_heading = 3 * np.pi / 2
+
+        previous_side = np.sign(self._angle_diff(previous_heading, downwind_heading))
+        current_side = np.sign(self._angle_diff(current_heading, downwind_heading))
+
+        return previous_side != 0 and current_side != 0 and previous_side != current_side
+
     def step(self, action):
+        previous_heading = self.boat.heading
+
         self.stepnum += 1
         action = np.clip(action, -1, 1)
         self.last_action = action[0]
 
         self.boat.command(action[0])
 
-        # Keep heading in 0 to 2π range instead of letting it grow forever
         self._normalize_heading()
+        current_heading = self.boat.heading
 
         obs, distance2target = self._get_obs()
         terminated, reward = self._get_reward(distance2target)
+
+        if self._crossed_downwind(previous_heading, current_heading):
+            reward += self.JIBE_BONUS
+            self.jibe_count += 1
+
+        self.last_reward = reward
 
         if self.render_mode == "human":
             self._render_frame()
@@ -100,6 +118,7 @@ class SailboatEnvDownwind(BoatEnv):
             {
                 "distance2target": np.linalg.norm(distance2target),
                 "heading": self.boat.heading,
+                "jibe_count": self.jibe_count,
             },
         )
 
@@ -131,6 +150,8 @@ class SailboatEnvDownwind(BoatEnv):
         )
 
     def reset(self, options=None, seed=None):
+        self.jibe_count = 0
+
         self.boat = SailBoat(
             x=self.COURSE_SIZE * (
                 COURSE_CENTER_X + self.np_random.uniform(-0.15, 0.15)
