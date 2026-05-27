@@ -379,70 +379,113 @@ class SailboatEnvReachRounding(BoatEnv):
         BoatEnv.COURSE_SIZE * LEEWARD_Y,
     )
 
-    # Reach rounding gates
+    # -------------------------------------------------
+    # APPROACH GATES
+    # Encourage proper downwind setup before rounding
+    # -------------------------------------------------
+
+    REACH_APPROACH_GATE_1 = (
+        BoatEnv.COURSE_SIZE * 0.44,
+        BoatEnv.COURSE_SIZE * 0.72,
+    )
+
+    REACH_APPROACH_GATE_2 = (
+        BoatEnv.COURSE_SIZE * 0.34,
+        BoatEnv.COURSE_SIZE * 0.66,
+    )
+
+    REACH_APPROACH_GATE_3 = (
+        BoatEnv.COURSE_SIZE * 0.25,
+        BoatEnv.COURSE_SIZE * 0.60,
+    )
+
+    REACH_APPROACH_GATE_4 = (
+        BoatEnv.COURSE_SIZE * 0.20,
+        BoatEnv.COURSE_SIZE * 0.56,
+    )
+
+    # -------------------------------------------------
+    # ROUNDING ARC GATES
+    # Create circular jibe path around reach buoy
+    # -------------------------------------------------
+
     REACH_NORTH_GATE = (
-        BoatEnv.COURSE_SIZE * (REACH_X - 0.025),
-        BoatEnv.COURSE_SIZE * (REACH_Y + 0.015),
+        BoatEnv.COURSE_SIZE * (REACH_X - 0.015),
+        BoatEnv.COURSE_SIZE * (REACH_Y + 0.035),
+    )
+
+    REACH_WEST_GATE = (
+        BoatEnv.COURSE_SIZE * (REACH_X - 0.045),
+        BoatEnv.COURSE_SIZE * REACH_Y,
     )
 
     REACH_SOUTH_GATE = (
-        BoatEnv.COURSE_SIZE * (REACH_X - 0.025),
-        BoatEnv.COURSE_SIZE * (REACH_Y - 0.015),
-    )
-
-    # Tight breadcrumb gates immediately after rounding
-    # to force continuation of the downwind arc
-    REACH_TURN_GATE_1 = (
-        BoatEnv.COURSE_SIZE * (REACH_X - 0.005),
+        BoatEnv.COURSE_SIZE * (REACH_X - 0.015),
         BoatEnv.COURSE_SIZE * (REACH_Y - 0.035),
     )
 
-    REACH_TURN_GATE_2 = (
-        BoatEnv.COURSE_SIZE * (REACH_X + 0.020),
+    REACH_SOUTHEAST_GATE = (
+        BoatEnv.COURSE_SIZE * (REACH_X + 0.035),
         BoatEnv.COURSE_SIZE * (REACH_Y - 0.055),
     )
 
-    REACH_TURN_GATE_3 = (
-        BoatEnv.COURSE_SIZE * (REACH_X + 0.035),
-        BoatEnv.COURSE_SIZE * (REACH_Y - 0.070),
-    )
+    # -------------------------------------------------
+    # EXIT GATES
+    # Force continued downwind exit after jibe
+    # -------------------------------------------------
 
-    # Broader downwind exit arc
     REACH_EXIT_GATE_1 = (
-        BoatEnv.COURSE_SIZE * (REACH_X + 0.05),
-        BoatEnv.COURSE_SIZE * (REACH_Y - 0.08),
+        BoatEnv.COURSE_SIZE * 0.30,
+        BoatEnv.COURSE_SIZE * 0.40,
     )
 
     REACH_EXIT_GATE_2 = (
-        BoatEnv.COURSE_SIZE * (REACH_X + 0.14),
-        BoatEnv.COURSE_SIZE * (REACH_Y - 0.16),
+        BoatEnv.COURSE_SIZE * 0.42,
+        BoatEnv.COURSE_SIZE * 0.31,
     )
 
     REACH_EXIT_GATE_3 = (
-        BoatEnv.COURSE_SIZE * (REACH_X + 0.25),
-        BoatEnv.COURSE_SIZE * (REACH_Y - 0.23),
+        BoatEnv.COURSE_SIZE * 0.53,
+        BoatEnv.COURSE_SIZE * 0.23,
     )
 
-    # Final downwind gate
+    # -------------------------------------------------
+    # FINAL LEEWARD GATE
+    # -------------------------------------------------
+
     LEEWARD_GATE = (
         BoatEnv.COURSE_SIZE * (COURSE_CENTER_X - 0.025),
         BoatEnv.COURSE_SIZE * (LEEWARD_Y - 0.015),
     )
+
+    # -------------------------------------------------
+    # VISIBLE BUOYS
+    # -------------------------------------------------
 
     COURSE_BUOYS = [
         REACH_BUOY,
         LEEWARD_BUOY,
     ]
 
+    # -------------------------------------------------
+    # GATE SEQUENCE
+    # -------------------------------------------------
+
     TARGET_SEQUENCE = [
+        REACH_APPROACH_GATE_1,
+        REACH_APPROACH_GATE_2,
+        REACH_APPROACH_GATE_3,
+        REACH_APPROACH_GATE_4,
+
         REACH_NORTH_GATE,
+        REACH_WEST_GATE,
         REACH_SOUTH_GATE,
-        REACH_TURN_GATE_1,
-        REACH_TURN_GATE_2,
-        REACH_TURN_GATE_3,
+        REACH_SOUTHEAST_GATE,
+
         REACH_EXIT_GATE_1,
         REACH_EXIT_GATE_2,
         REACH_EXIT_GATE_3,
+
         LEEWARD_GATE,
     ]
 
@@ -462,7 +505,10 @@ class SailboatEnvReachRounding(BoatEnv):
                     self.last_action,
                 )
             ],
-            target=self.COURSE_BUOYS,
+            target=[
+                self.REACH_BUOY,
+                self.LEEWARD_BUOY,
+            ],
             gate=self.TARGET,
             stepnum=self.stepnum,
             reward=self.last_reward,
@@ -477,7 +523,7 @@ class SailboatEnvReachRounding(BoatEnv):
         windward_x, windward_y = self.WINDWARD_BUOY
 
         self.boat = SailBoat(
-            # Same start style as WindwardToReach
+            # Similar start to WindwardToReach
             x=windward_x + self.COURSE_SIZE * self.np_random.uniform(-0.08, 0.08),
 
             y=windward_y - self.COURSE_SIZE * self.np_random.uniform(0.03, 0.10),
@@ -497,7 +543,10 @@ class SailboatEnvReachRounding(BoatEnv):
 
         distance = np.linalg.norm(distance2target)
 
-        # Reached active gate
+        # ---------------------------------------------
+        # Gate reached
+        # ---------------------------------------------
+
         if distance < self.TARGET_RAD:
             self.current_gate_index += 1
 
@@ -509,12 +558,11 @@ class SailboatEnvReachRounding(BoatEnv):
                 self.last_reward = reward
                 return terminated, reward
 
-            # Advance target
+            # Advance to next gate
             self.TARGET = self.TARGET_SEQUENCE[self.current_gate_index]
 
             reward += 50
 
-            # Reset progress shaping
             self.prev_distance2target = (
                 np.array([self.boat.x, self.boat.y])
                 - np.array(self.TARGET)
@@ -523,12 +571,18 @@ class SailboatEnvReachRounding(BoatEnv):
             self.last_reward = reward
             return terminated, reward
 
+        # ---------------------------------------------
         # Out of bounds
+        # ---------------------------------------------
+
         if distance >= self.COURSE_SIZE:
             reward = -100
             terminated = True
 
-        # Progress shaping reward
+        # ---------------------------------------------
+        # Dense shaping reward
+        # ---------------------------------------------
+
         reward += 10 * (
             np.linalg.norm(self.prev_distance2target, 8)
             - np.linalg.norm(distance2target, 8)
