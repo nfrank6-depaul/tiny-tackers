@@ -1,2 +1,4 @@
 env_id,model,training_timesteps,n_eval_episodes,mean_reward,std_reward,mean_episode_timesteps,std_episode_timesteps,training_time_seconds
 SailboatReachRounding-v0,PPO,500000,20,540.094926,21.57907897118005,604.2,21.869469225624258,629.4267675876617
+SailboatReachRounding-v0,PPO,500000,20,540.5973454,19.914328932783704,606.25,18.909410077357894,621.4955246448517
+SailboatReachRounding-v0,PPO,500000,20,826.70812205,23.31616065285638,666.25,13.943023156290106,622.1590805053711
