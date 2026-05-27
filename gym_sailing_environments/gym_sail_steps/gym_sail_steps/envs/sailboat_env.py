@@ -62,8 +62,29 @@ class SailboatEnvDownwind(BoatEnv):
 
     TARGET = ROUNDING_GATE
 
+    UPWIND_HEADING_PENALTY = 2.0
+    SPIN_PENALTY = 5.0
+
     def __init__(self, render_mode=None):
         super().__init__(render_mode)
+
+    def _angle_diff(self, a, b):
+        return (a - b + np.pi) % (2 * np.pi) - np.pi
+
+    def _is_near_upwind(self):
+        return abs(self._angle_diff(self.boat.heading, np.pi / 2)) < 0.6
+
+    def _get_reward(self, distance2target):
+        terminated, reward = super()._get_reward(distance2target)
+
+        if self._is_near_upwind():
+            reward -= self.UPWIND_HEADING_PENALTY
+
+        if abs(self.boat.heading_dot) > 0.25:
+            reward -= self.SPIN_PENALTY
+
+        self.last_reward = reward
+        return terminated, reward
 
     def _render_frame(self):
         return self.renderer._render_frame(
