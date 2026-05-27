@@ -364,6 +364,11 @@ class SailboatEnvTriangle(BoatEnv):
         return terminated, reward
 
 class SailboatEnvReachRounding(BoatEnv):
+    WINDWARD_BUOY = (
+        BoatEnv.COURSE_SIZE * COURSE_CENTER_X,
+        BoatEnv.COURSE_SIZE * WINDWARD_Y,
+    )
+
     REACH_BUOY = (
         BoatEnv.COURSE_SIZE * REACH_X,
         BoatEnv.COURSE_SIZE * REACH_Y,
@@ -389,6 +394,11 @@ class SailboatEnvReachRounding(BoatEnv):
         BoatEnv.COURSE_SIZE * (LEEWARD_Y - 0.015),
     )
 
+    COURSE_BUOYS = [
+        REACH_BUOY,
+        LEEWARD_BUOY,
+    ]
+
     TARGET_SEQUENCE = [
         REACH_NORTH_GATE,
         REACH_SOUTH_GATE,
@@ -401,12 +411,6 @@ class SailboatEnvReachRounding(BoatEnv):
         self.TARGET = self.TARGET_SEQUENCE[self.current_gate_index]
 
     def _render_frame(self):
-        visible_target = (
-            self.REACH_BUOY
-            if self.current_gate_index < 2
-            else self.LEEWARD_BUOY
-        )
-
         return self.renderer._render_frame(
             boats=[
                 (
@@ -416,7 +420,7 @@ class SailboatEnvReachRounding(BoatEnv):
                     self.last_action,
                 )
             ],
-            target=visible_target,
+            target=self.COURSE_BUOYS,
             gate=self.TARGET,
             stepnum=self.stepnum,
             reward=self.last_reward,
@@ -428,11 +432,12 @@ class SailboatEnvReachRounding(BoatEnv):
         self.current_gate_index = 0
         self.TARGET = self.TARGET_SEQUENCE[self.current_gate_index]
 
-        reach_x, reach_y = self.REACH_BUOY
+        windward_x, windward_y = self.WINDWARD_BUOY
 
         self.boat = SailBoat(
-            x=reach_x + self.COURSE_SIZE * self.np_random.uniform(0.03, 0.10),
-            y=reach_y + self.COURSE_SIZE * self.np_random.uniform(0.03, 0.10),
+            # Same start style as SailboatEnvWindwardToReach
+            x=windward_x + self.COURSE_SIZE * self.np_random.uniform(-0.08, 0.08),
+            y=windward_y - self.COURSE_SIZE * self.np_random.uniform(0.03, 0.10),
             heading=np.pi + self.np_random.uniform(-0.75, 0.75),
             heading_dot=self.np_random.uniform(-0.03, 0.03),
             speed=self.np_random.uniform(0, 0.5),
@@ -478,4 +483,3 @@ class SailboatEnvReachRounding(BoatEnv):
         self.last_reward = reward
 
         return terminated, reward
-
