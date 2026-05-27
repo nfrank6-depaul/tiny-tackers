@@ -1,6 +1,0 @@
-env_id,model,source_model,training_stage,additional_training_timesteps,n_eval_episodes,mean_reward,std_reward,mean_episode_timesteps,std_episode_timesteps,training_time_seconds
-SailboatRace-v0,PPO,models/ppo/base/ppo_base_1M.zip,base_to_race,500000,20,-4725.640139,,20000.0,,644.2484176158905
-SailboatRace2Mark-v0,PPO,models/ppo/base/ppo_base_1M.zip,base_to_race,500000,20,-105.396178,,2607.0,,662.5363800525665
-SailboatRace2Mark-v0,PPO,models/ppo/base/ppo_base_1M.zip,base_to_race,500000,20,556.1588681000001,87.17929409245636,1287.1,45.16857314549574,1303.0308735370636
-SailboatRace2Mark-v0,PPO,models/ppo/base/ppo_base_1M.zip,base_to_race,500000,20,383.30447015,86.8923334145969,1909.35,186.18872004953525,1302.2242436408997
-SailboatRace2Mark-v0,PPO,models/ppo/base/ppo_base_1M.zip,base_to_race,500000,20,493.7350001,62.78067032159472,1639.75,111.75060343649628,1278.3692133426666

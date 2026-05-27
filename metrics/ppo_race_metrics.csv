@@ -1,3 +1,0 @@
-env_id,model,training_timesteps,n_eval_episodes,mean_reward,std_reward,mean_episode_timesteps,std_episode_timesteps,training_time_seconds
-SailboatRace-v0,PPO,1000000,20,-309.696127,5.832011720969798e-14,1130.0,0.0,1270.6828384399414
-SailboatRace-v0,PPO,250000,20,1108.19897495,523.2015365184335,5106.3,1947.692051202086,330.7817623615265
