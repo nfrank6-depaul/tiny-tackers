@@ -50,17 +50,22 @@ class Renderer:
         self.window = None
         self.clock = None
 
+    # I HAD TO MODIFY THIS FUNCTION TO GET RENDERING WORKING IN VIDEO RECORDING IN COLAB
     def _render_frame(self, boats, target, stepnum, reward, render_mode, fps):
-        if self.window is None and render_mode in ["human", "rgb_array"]:
-            # FIXME: self.window should be used only in human mode,
-            # in rgb mode there is no need to create a window, only the surface
-            # the surface should be separated from the window
+        if self.window is None:
             pygame.init()
-            pygame.display.init()
-            self.window = pygame.display.set_mode(
-                (self.screen_width, self.screen_height)
-            )
-            pygame.display.set_caption("Boat Environment")
+
+            if render_mode == "human":
+                pygame.display.init()
+                self.window = pygame.display.set_mode(
+                    (self.screen_width, self.screen_height)
+                )
+                pygame.display.set_caption("Boat Environment")
+
+            elif render_mode == "rgb_array":
+                self.window = pygame.Surface(
+                    (self.screen_width, self.screen_height)
+                )
 
         if self.clock is None and render_mode == "human":
             self.clock = pygame.time.Clock()
@@ -69,11 +74,12 @@ class Renderer:
         self.draw_target(target)
 
         for n, boat in enumerate(boats):
-            if n == 0:  # for the first boat only, draw the trail
+            if n == 0:
                 self.draw_trail(boat)
 
             boat_heading = boat[2]
             boat_pos = (boat[0], boat[1])
+
             if len(boat) > 3:
                 rudder = -0.5 * boat[3]
             else:
@@ -97,7 +103,6 @@ class Renderer:
             pygame.event.pump()
             pygame.display.update()
 
-            # Handle events
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.close()
@@ -273,11 +278,9 @@ class Renderer:
 
     def close(self):
         if self.window is not None:
-            import pygame
-
             pygame.display.quit()
             pygame.quit()
-            quit()
+            self.window = None
 
 
 def norm(angle):
