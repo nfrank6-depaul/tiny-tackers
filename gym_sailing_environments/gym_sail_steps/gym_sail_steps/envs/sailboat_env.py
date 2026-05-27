@@ -363,4 +363,119 @@ class SailboatEnvTriangle(BoatEnv):
 
         return terminated, reward
 
+class SailboatEnvReachRounding(BoatEnv):
+    REACH_BUOY = (
+        BoatEnv.COURSE_SIZE * REACH_X,
+        BoatEnv.COURSE_SIZE * REACH_Y,
+    )
+
+    LEEWARD_BUOY = (
+        BoatEnv.COURSE_SIZE * COURSE_CENTER_X,
+        BoatEnv.COURSE_SIZE * LEEWARD_Y,
+    )
+
+    REACH_NORTH_GATE = (
+        BoatEnv.COURSE_SIZE * (REACH_X - 0.025),
+        BoatEnv.COURSE_SIZE * (REACH_Y + 0.015),
+    )
+
+    REACH_SOUTH_GATE = (
+        BoatEnv.COURSE_SIZE * (REACH_X - 0.025),
+        BoatEnv.COURSE_SIZE * (REACH_Y - 0.015),
+    )
+
+    LEEWARD_GATE = (
+        BoatEnv.COURSE_SIZE * (COURSE_CENTER_X - 0.025),
+        BoatEnv.COURSE_SIZE * (LEEWARD_Y - 0.015),
+    )
+
+    TARGET_SEQUENCE = [
+        REACH_NORTH_GATE,
+        REACH_SOUTH_GATE,
+        LEEWARD_GATE,
+    ]
+
+    def __init__(self, render_mode=None):
+        super().__init__(render_mode)
+        self.current_gate_index = 0
+        self.TARGET = self.TARGET_SEQUENCE[self.current_gate_index]
+
+    def _render_frame(self):
+        visible_target = (
+            self.REACH_BUOY
+            if self.current_gate_index < 2
+            else self.LEEWARD_BUOY
+        )
+
+        return self.renderer._render_frame(
+            boats=[
+                (
+                    self.boat.x,
+                    self.boat.y,
+                    self.boat.heading - np.pi / 2,
+                    self.last_action,
+                )
+            ],
+            target=visible_target,
+            gate=self.TARGET,
+            stepnum=self.stepnum,
+            reward=self.last_reward,
+            render_mode=self.render_mode,
+            fps=self.metadata["render_fps"],
+        )
+
+    def reset(self, options=None, seed=None):
+        self.current_gate_index = 0
+        self.TARGET = self.TARGET_SEQUENCE[self.current_gate_index]
+
+        reach_x, reach_y = self.REACH_BUOY
+
+        self.boat = SailBoat(
+            x=reach_x + self.COURSE_SIZE * self.np_random.uniform(0.03, 0.10),
+            y=reach_y + self.COURSE_SIZE * self.np_random.uniform(0.03, 0.10),
+            heading=np.pi + self.np_random.uniform(-0.75, 0.75),
+            heading_dot=self.np_random.uniform(-0.03, 0.03),
+            speed=self.np_random.uniform(0, 0.5),
+        )
+
+        return super().reset(options, seed)
+
+    def _get_reward(self, distance2target):
+        terminated = False
+        reward = -0.1
+
+        distance = np.linalg.norm(distance2target)
+
+        if distance < self.TARGET_RAD:
+            self.current_gate_index += 1
+
+            if self.current_gate_index >= len(self.TARGET_SEQUENCE):
+                reward += 100
+                terminated = True
+                self.last_reward = reward
+                return terminated, reward
+
+            self.TARGET = self.TARGET_SEQUENCE[self.current_gate_index]
+            reward += 50
+
+            self.prev_distance2target = (
+                np.array([self.boat.x, self.boat.y]) - np.array(self.TARGET)
+            )
+
+            self.last_reward = reward
+            return terminated, reward
+
+        if distance >= self.COURSE_SIZE:
+            reward = -100
+            terminated = True
+
+        reward += 10 * (
+            np.linalg.norm(self.prev_distance2target, 8)
+            - np.linalg.norm(distance2target, 8)
+        )
+
+        self.prev_distance2target = distance2target
+        self.last_reward = reward
+
+        return terminated, reward
 
