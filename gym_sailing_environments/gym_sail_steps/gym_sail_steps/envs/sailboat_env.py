@@ -379,6 +379,7 @@ class SailboatEnvReachRounding(BoatEnv):
         BoatEnv.COURSE_SIZE * LEEWARD_Y,
     )
 
+    # Reach rounding gates
     REACH_NORTH_GATE = (
         BoatEnv.COURSE_SIZE * (REACH_X - 0.025),
         BoatEnv.COURSE_SIZE * (REACH_Y + 0.015),
@@ -389,6 +390,23 @@ class SailboatEnvReachRounding(BoatEnv):
         BoatEnv.COURSE_SIZE * (REACH_Y - 0.015),
     )
 
+    # Breadcrumb gates to force a downwind/jibing-style exit
+    REACH_EXIT_GATE_1 = (
+        BoatEnv.COURSE_SIZE * (REACH_X + 0.05),
+        BoatEnv.COURSE_SIZE * (REACH_Y - 0.08),
+    )
+
+    REACH_EXIT_GATE_2 = (
+        BoatEnv.COURSE_SIZE * (REACH_X + 0.14),
+        BoatEnv.COURSE_SIZE * (REACH_Y - 0.16),
+    )
+
+    REACH_EXIT_GATE_3 = (
+        BoatEnv.COURSE_SIZE * (REACH_X + 0.25),
+        BoatEnv.COURSE_SIZE * (REACH_Y - 0.23),
+    )
+
+    # Final downwind gate
     LEEWARD_GATE = (
         BoatEnv.COURSE_SIZE * (COURSE_CENTER_X - 0.025),
         BoatEnv.COURSE_SIZE * (LEEWARD_Y - 0.015),
@@ -402,11 +420,15 @@ class SailboatEnvReachRounding(BoatEnv):
     TARGET_SEQUENCE = [
         REACH_NORTH_GATE,
         REACH_SOUTH_GATE,
+        REACH_EXIT_GATE_1,
+        REACH_EXIT_GATE_2,
+        REACH_EXIT_GATE_3,
         LEEWARD_GATE,
     ]
 
     def __init__(self, render_mode=None):
         super().__init__(render_mode)
+
         self.current_gate_index = 0
         self.TARGET = self.TARGET_SEQUENCE[self.current_gate_index]
 
@@ -435,11 +457,15 @@ class SailboatEnvReachRounding(BoatEnv):
         windward_x, windward_y = self.WINDWARD_BUOY
 
         self.boat = SailBoat(
-            # Same start style as SailboatEnvWindwardToReach
+            # Same style start as WindwardToReach
             x=windward_x + self.COURSE_SIZE * self.np_random.uniform(-0.08, 0.08),
+
             y=windward_y - self.COURSE_SIZE * self.np_random.uniform(0.03, 0.10),
+
             heading=np.pi + self.np_random.uniform(-0.75, 0.75),
+
             heading_dot=self.np_random.uniform(-0.03, 0.03),
+
             speed=self.np_random.uniform(0, 0.5),
         )
 
@@ -451,35 +477,45 @@ class SailboatEnvReachRounding(BoatEnv):
 
         distance = np.linalg.norm(distance2target)
 
+        # Reached active gate
         if distance < self.TARGET_RAD:
             self.current_gate_index += 1
 
+            # Finished full sequence
             if self.current_gate_index >= len(self.TARGET_SEQUENCE):
                 reward += 100
                 terminated = True
+
                 self.last_reward = reward
                 return terminated, reward
 
+            # Advance to next gate
             self.TARGET = self.TARGET_SEQUENCE[self.current_gate_index]
+
             reward += 50
 
+            # Reset shaping reference
             self.prev_distance2target = (
-                np.array([self.boat.x, self.boat.y]) - np.array(self.TARGET)
+                np.array([self.boat.x, self.boat.y])
+                - np.array(self.TARGET)
             )
 
             self.last_reward = reward
             return terminated, reward
 
+        # Out of bounds
         if distance >= self.COURSE_SIZE:
             reward = -100
             terminated = True
 
+        # Progress shaping
         reward += 10 * (
             np.linalg.norm(self.prev_distance2target, 8)
             - np.linalg.norm(distance2target, 8)
         )
 
         self.prev_distance2target = distance2target
+
         self.last_reward = reward
 
         return terminated, reward
