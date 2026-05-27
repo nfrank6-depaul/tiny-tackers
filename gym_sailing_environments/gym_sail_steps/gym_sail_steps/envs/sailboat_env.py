@@ -62,7 +62,7 @@ class SailboatEnvDownwind(BoatEnv):
 
     TARGET = ROUNDING_GATE
 
-    UPWIND_HEADING_PENALTY = 1.0
+    UPWIND_HEADING_PENALTY = 2.0
 
     def __init__(self, render_mode=None):
         super().__init__(render_mode)
