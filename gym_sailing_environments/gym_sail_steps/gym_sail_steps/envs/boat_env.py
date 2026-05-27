@@ -160,14 +160,3 @@ class BoatEnv(gym.Env):
 def norm(angle):
     return (angle + np.pi) % (2 * np.pi) - np.pi
 
-
-# Discrete action space version of BoatEnv
-class BoatDiscreteEnv(BoatEnv):
-    def __init__(self, render_mode=None):
-        super().__init__(render_mode)
-        self.action_space = spaces.Discrete(3)
-
-    def step(self, action):
-        action = action - 1
-        return super().step([action])
-        return super().step([action])
