@@ -400,7 +400,7 @@ class SailboatEnvReachRounding(BoatEnv):
     ]
 
     CLOCKWISE_TURN_PENALTY = -1
-    ALIVE_PENALTY = -1
+    ALIVE_PENALTY = -0.3
     INTERMEDIATE_GATE_REWARD = 75
     FINAL_GATE_REWARD = 300
 
