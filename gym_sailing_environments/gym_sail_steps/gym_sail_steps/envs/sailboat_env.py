@@ -379,61 +379,9 @@ class SailboatEnvReachRounding(BoatEnv):
         BoatEnv.COURSE_SIZE * LEEWARD_Y,
     )
 
-    CLOCKWISE_TURN_TERMINATION_PENALTY = -200
-
-    REACH_APPROACH_GATE_1 = (
-        BoatEnv.COURSE_SIZE * 0.44,
-        BoatEnv.COURSE_SIZE * 0.72,
-    )
-
-    REACH_APPROACH_GATE_2 = (
-        BoatEnv.COURSE_SIZE * 0.34,
-        BoatEnv.COURSE_SIZE * 0.66,
-    )
-
-    REACH_APPROACH_GATE_3 = (
-        BoatEnv.COURSE_SIZE * 0.25,
-        BoatEnv.COURSE_SIZE * 0.60,
-    )
-
-    REACH_APPROACH_GATE_4 = (
-        BoatEnv.COURSE_SIZE * 0.20,
-        BoatEnv.COURSE_SIZE * 0.56,
-    )
-
-    REACH_NORTH_GATE = (
-        BoatEnv.COURSE_SIZE * (REACH_X - 0.015),
-        BoatEnv.COURSE_SIZE * (REACH_Y + 0.035),
-    )
-
-    REACH_WEST_GATE = (
-        BoatEnv.COURSE_SIZE * (REACH_X - 0.045),
-        BoatEnv.COURSE_SIZE * REACH_Y,
-    )
-
-    REACH_SOUTH_GATE = (
-        BoatEnv.COURSE_SIZE * (REACH_X - 0.015),
-        BoatEnv.COURSE_SIZE * (REACH_Y - 0.035),
-    )
-
-    REACH_SOUTHEAST_GATE = (
-        BoatEnv.COURSE_SIZE * (REACH_X + 0.035),
-        BoatEnv.COURSE_SIZE * (REACH_Y - 0.055),
-    )
-
-    REACH_EXIT_GATE_1 = (
-        BoatEnv.COURSE_SIZE * 0.30,
-        BoatEnv.COURSE_SIZE * 0.40,
-    )
-
-    REACH_EXIT_GATE_2 = (
-        BoatEnv.COURSE_SIZE * 0.42,
-        BoatEnv.COURSE_SIZE * 0.31,
-    )
-
-    REACH_EXIT_GATE_3 = (
-        BoatEnv.COURSE_SIZE * 0.53,
-        BoatEnv.COURSE_SIZE * 0.23,
+    REACH_GATE = (
+        BoatEnv.COURSE_SIZE * (REACH_X - 0.025),
+        BoatEnv.COURSE_SIZE * (REACH_Y + 0.015),
     )
 
     LEEWARD_GATE = (
@@ -447,19 +395,14 @@ class SailboatEnvReachRounding(BoatEnv):
     ]
 
     TARGET_SEQUENCE = [
-        REACH_APPROACH_GATE_1,
-        REACH_APPROACH_GATE_2,
-        REACH_APPROACH_GATE_3,
-        REACH_APPROACH_GATE_4,
-        REACH_NORTH_GATE,
-        REACH_WEST_GATE,
-        REACH_SOUTH_GATE,
-        REACH_SOUTHEAST_GATE,
-        REACH_EXIT_GATE_1,
-        REACH_EXIT_GATE_2,
-        REACH_EXIT_GATE_3,
+        REACH_GATE,
         LEEWARD_GATE,
     ]
+
+    CLOCKWISE_TURN_PENALTY = -1
+    ALIVE_PENALTY = -1
+    INTERMEDIATE_GATE_REWARD = 75
+    FINAL_GATE_REWARD = 300
 
     def __init__(self, render_mode=None):
         super().__init__(render_mode)
@@ -478,8 +421,7 @@ class SailboatEnvReachRounding(BoatEnv):
         heading_change = self._angle_diff(current_heading, previous_heading)
 
         if heading_change < 0:
-            reward = self.CLOCKWISE_TURN_TERMINATION_PENALTY
-            
+            reward += self.CLOCKWISE_TURN_PENALTY
 
         self.last_reward = reward
 
@@ -524,7 +466,7 @@ class SailboatEnvReachRounding(BoatEnv):
 
     def _get_reward(self, distance2target):
         terminated = False
-        reward = -0.1
+        reward = self.ALIVE_PENALTY
 
         distance = np.linalg.norm(distance2target)
 
@@ -532,13 +474,13 @@ class SailboatEnvReachRounding(BoatEnv):
             self.current_gate_index += 1
 
             if self.current_gate_index >= len(self.TARGET_SEQUENCE):
-                reward += 100
+                reward += self.FINAL_GATE_REWARD
                 terminated = True
                 self.last_reward = reward
                 return terminated, reward
 
             self.TARGET = self.TARGET_SEQUENCE[self.current_gate_index]
-            reward += 50
+            reward += self.INTERMEDIATE_GATE_REWARD
 
             self.prev_distance2target = (
                 np.array([self.boat.x, self.boat.y]) - np.array(self.TARGET)
