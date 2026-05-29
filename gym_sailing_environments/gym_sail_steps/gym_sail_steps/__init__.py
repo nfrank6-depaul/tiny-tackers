@@ -27,7 +27,7 @@ register(
 register(
     id="SailboatTriangle-v0",
     entry_point="gym_sail_steps.envs:SailboatEnvTriangle",
-    max_episode_steps=10000,
+    max_episode_steps=30000,
 )
 
 register(
