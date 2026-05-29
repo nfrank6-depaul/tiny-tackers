@@ -1,0 +1,3 @@
+env_id,model,training_timesteps,n_eval_episodes,mean_reward,std_reward,mean_episode_timesteps,std_episode_timesteps,training_time_seconds
+SailboatDownwind-v0,PPO,250000,20,286.8256893,40.99475190174192,1521.7,412.9489709777456,368.6056852340698
+SailboatDownwind-v0,PPO,500000,20,339.6857704,22.25963360981896,995.3,228.20607030996302,372.6593220233917
