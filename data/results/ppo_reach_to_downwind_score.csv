@@ -1,0 +1,2 @@
+agent,env_id,model_path,total_reward,timesteps
+PPO Reach to Downwind Model,SailboatReachToDownwind-v0,models/ppo/reach_to_downwind_step/ppo_upwind_1M_windwardtoreach_250K_reachtoleeward_250K.zip,252.51891281977208,225
