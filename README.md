@@ -1,4 +1,4 @@
-
+![Tiny Tacker Logo](images/tiny_tacker_ai_and_human_small_logo.png)
 # Tiny-Tackers
 
 A reinforcement learning sailing environment and autonomous sailboat training project built with Python, Gymnasium, and Stable-Baselines3.
