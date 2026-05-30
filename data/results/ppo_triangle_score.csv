@@ -1,0 +1,2 @@
+agent,env_id,model_path,total_reward,timesteps
+PPO Triangle Model,SailboatTriangle-v0,models/ppo/triangle_race_step/ppo_upwind_1M_windwardtoreach_250K_reachtoleeward_250K_reachrounding_250K_upwind_500K_downwind_500K_triangle_2M.zip,1547.856576431334,9673

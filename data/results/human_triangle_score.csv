@@ -1,0 +1,2 @@
+agent,env_id,total_reward,timesteps
+Human,SailboatTriangle-v0,2093.0810486864398,4122
