@@ -65,6 +65,7 @@ Their original license was preserved in this project as GABO-TOR_LICENSE_NOTES g
 tiny-tackers/
 │
 ├── data/                            # Where the results of human runs reside
+├── graveyard/                       # Where all the things I tried that didn't work out ended up. Feel free to use or modify to make a more robust agent
 ├── gym_sailing_environments/        # Where my custom environments and Gabo-Tor's environment reside
 ├── metrics/                         # Where the results of your model training runs resides
 ├── models/                          # Where you can store saved trained PPO models
