@@ -29,7 +29,7 @@ builtins.quit = lambda *args, **kwargs: None
 ENV_ID = "SailboatWindwardToReach-v0"
 MAX_STEPS = 10_000
 RESULTS_DIR = "data/results"
-RESULTS_PATH = os.path.join(RESULTS_DIR, "human_race_score.csv")
+RESULTS_PATH = os.path.join(RESULTS_DIR, "human_windward_to_reach_score.csv")
 
  
 def get_human_action(env):
@@ -113,7 +113,7 @@ def run_human_episode():
             pass
 
     return {
-        "agent": "Human Race",
+        "agent": "Human",
         "env_id": ENV_ID,
         "total_reward": total_reward,
         "timesteps": timesteps,

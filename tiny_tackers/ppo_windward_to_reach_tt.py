@@ -2,84 +2,64 @@ import os
 import sys
 import time
 import builtins
-import numpy as np
 import pandas as pd
 import gymnasium as gym
 import pygame
+
+from stable_baselines3 import PPO
 
 builtins.quit = lambda *args, **kwargs: None
 
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 os.chdir(REPO_ROOT)
 
-GYM_SAILING_PARENT = os.path.join(
+GYM_SAIL_STEPS_PARENT = os.path.join(
     REPO_ROOT,
     "gym_sailing_environments",
     "gym_sail_steps",
 )
 
-sys.path.insert(0, GYM_SAILING_PARENT)
+GYM_SAIL_STEPS_PACKAGE = os.path.join(
+    GYM_SAIL_STEPS_PARENT,
+    "gym_sail_steps",
+)
 
+if not os.path.isdir(GYM_SAIL_STEPS_PACKAGE):
+    raise FileNotFoundError(
+        "Could not find the local gym_sail_steps package.\n"
+        f"Expected package folder at: {GYM_SAIL_STEPS_PACKAGE}\n"
+        f"Current working directory: {os.getcwd()}\n"
+        "Confirm that the repo contains: "
+        "gym_sailing_environments/gym_sail_steps/gym_sail_steps"
+    )
+
+sys.path.insert(0, GYM_SAIL_STEPS_PARENT)
+
+# type ignore because the package is loaded by path above.
 import gym_sail_steps  # type: ignore
+
 print("Loaded gym_sail_steps from:", gym_sail_steps.__file__)
 
-builtins.quit = lambda *args, **kwargs: None
-
-
-ENV_ID = "SailboatUpwind-v0"
+ENV_ID = "SailboatWindwardToReach-v0"
 MAX_STEPS = 10_000
+MODEL_PATH = "models/ppo/windward_to_reach/ppo_upwind_1M_windwardtoreach_250K.zip"
 RESULTS_DIR = "data/results"
-RESULTS_PATH = os.path.join(RESULTS_DIR, "human_upwind_score.csv")
+RESULTS_PATH = os.path.join(RESULTS_DIR, "ppo_windward_to_reach_score.csv")
 
 
-def get_human_action(env):
-    pygame.event.pump()
-    keys = pygame.key.get_pressed()
-
-    steer = 0.0
-
-    if keys[pygame.K_LEFT]:
-        steer = -1.0
-    elif keys[pygame.K_RIGHT]:
-        steer = 1.0
-
-    action = np.array([steer], dtype=np.float32)
-    return np.clip(action, env.action_space.low, env.action_space.high)
-
-
-def run_human_episode():
+def run_ppo_episode():
     pygame.init()
+
+    model = PPO.load(MODEL_PATH)
     env = gym.make(ENV_ID, render_mode="human")
-    print("Created environment:", env.unwrapped.__class__.__name__)
-    print("Environment id:", ENV_ID)
     obs, info = env.reset()
 
     total_reward = 0.0
     timesteps = 0
     running = True
 
-    print("Human controls:")
-    print("LEFT arrow = steer left")
-    print("RIGHT arrow = steer right")
-    print("SPACE = start")
+    print("PPO Upwind Model running...")
     print("ESC = quit episode")
-
-    waiting = True
-    time.sleep(0.5)
-
-    while waiting:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                waiting = False
-                running = False
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    waiting = False
-                elif event.key == pygame.K_ESCAPE:
-                    waiting = False
-                    running = False
-
-        time.sleep(0.01)
 
     try:
         while running and timesteps < MAX_STEPS:
@@ -89,7 +69,7 @@ def run_human_episode():
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     running = False
 
-            action = get_human_action(env)
+            action, _ = model.predict(obs, deterministic=True)
             obs, reward, terminated, truncated, info = env.step(action)
 
             total_reward += reward
@@ -113,8 +93,9 @@ def run_human_episode():
             pass
 
     return {
-        "agent": "Human",
+        "agent": "PPO Upwind Model",
         "env_id": ENV_ID,
+        "model_path": MODEL_PATH,
         "total_reward": total_reward,
         "timesteps": timesteps,
     }
@@ -123,8 +104,8 @@ def run_human_episode():
 if __name__ == "__main__":
     os.makedirs(RESULTS_DIR, exist_ok=True)
 
-    result = run_human_episode()
+    result = run_ppo_episode()
     pd.DataFrame([result]).to_csv(RESULTS_PATH, index=False)
 
-    print("Saved human score:")
+    print("Saved PPO score:")
     print(result)

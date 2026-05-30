@@ -113,7 +113,7 @@ def run_human_episode():
             pass
 
     return {
-        "agent": "Human Race",
+        "agent": "Human",
         "env_id": ENV_ID,
         "total_reward": total_reward,
         "timesteps": timesteps,

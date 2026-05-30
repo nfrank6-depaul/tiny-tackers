@@ -1,0 +1,2 @@
+agent,env_id,model_path,total_reward,timesteps
+PPO Upwind Model,SailboatUpwind-v0,models/ppo/upwind_step/ppo_upwind_step_1M.zip,311.1221417769609,1286
