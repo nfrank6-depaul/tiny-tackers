@@ -36,7 +36,7 @@ print("Loaded gym_sailing from:", gym_sailing.__file__)
 
 ENV_ID = "Sailboat-v0"
 MAX_STEPS = 10_000
-MODEL_PATH = "models/ppo/base/ppo_base_1M.zip"
+MODEL_PATH = "models/ppo/base/ppo_gabo-tor_base_1M.zip"
 RESULTS_DIR = "data/results"
 RESULTS_PATH = os.path.join(RESULTS_DIR, "ppo_score.csv")
 
