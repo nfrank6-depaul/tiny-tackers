@@ -42,7 +42,7 @@ print("Loaded gym_sail_steps from:", gym_sail_steps.__file__)
 
 ENV_ID = "SailboatWindwardToReach-v0"
 MAX_STEPS = 10_000
-MODEL_PATH = "models/ppo/windward_to_reach/ppo_upwind_1M_windwardtoreach_250K.zip"
+MODEL_PATH = "models/ppo/windward_to_reach_step/ppo_upwind_1M_windwardtoreach_250K.zip"
 RESULTS_DIR = "data/results"
 RESULTS_PATH = os.path.join(RESULTS_DIR, "ppo_windward_to_reach_score.csv")
 
@@ -58,7 +58,7 @@ def run_ppo_episode():
     timesteps = 0
     running = True
 
-    print("PPO Upwind Model running...")
+    print("PPO Windward to Reach Model running...")
     print("ESC = quit episode")
 
     try:
@@ -93,7 +93,7 @@ def run_ppo_episode():
             pass
 
     return {
-        "agent": "PPO Upwind Model",
+        "agent": "PPO Windward to Reach Model",
         "env_id": ENV_ID,
         "model_path": MODEL_PATH,
         "total_reward": total_reward,

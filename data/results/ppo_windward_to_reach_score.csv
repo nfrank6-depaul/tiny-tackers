@@ -1,0 +1,2 @@
+agent,env_id,model_path,total_reward,timesteps
+PPO Windward to Reach Model,SailboatWindwardToReach-v0,models/ppo/windward_to_reach_step/ppo_upwind_1M_windwardtoreach_250K.zip,254.32951563684367,218
