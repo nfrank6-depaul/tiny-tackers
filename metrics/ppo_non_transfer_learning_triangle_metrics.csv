@@ -1,0 +1,2 @@
+env_id,model,training_timesteps,n_eval_episodes,mean_reward,std_reward,mean_episode_timesteps,std_episode_timesteps,training_time_seconds
+SailboatTriangle-v0,PPO,2000000,20,-871.9241662000001,246.77078676023365,7483.9,2650.7427340474337,2524.5651054382324
