@@ -23,7 +23,7 @@ Along the way the PPO tiny tacker (agent) should learn:
 - Long term strategizing
 
 ### Phase 2:
-### Regardless of how well the PPO tiny-tacker performs, you (the human) must complete each of the learning tasks from phase 1.
+### Regardless of how well the PPO tiny-tacker performs, you (the human) must complete each of the learning tasks from phase 1 (you can skip the reach rounding if you like).
 
 - You will compete with the PPO for the lowest amount of timesteps needed to complete the learning tasks.
 
@@ -100,6 +100,8 @@ source .venv/bin/activate
 ## Install Dependencies
 
 pip install -r requirements.txt
+
+Note: this will work on windows computers as well but your terminal call syntax may be different. Use the calls that make sense for your operating system
 
 ---
 
